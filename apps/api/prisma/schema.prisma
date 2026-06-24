@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  businessName  String
+  sector        String
+  features      String   @db.LongText
+  blocks        Json
+  globalPalette Json
+  publishedUrl  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("projects")
+}
+
+model Lead {
+  id           String   @id @default(cuid())
+  businessName String
+  email        String
+  whatsapp     String?
+  sector       String
+  createdAt    DateTime @default(now())
+
+  @@map("leads")
+}
