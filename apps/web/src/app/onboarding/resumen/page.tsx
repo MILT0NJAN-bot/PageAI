@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { calculatePrice, formatPrice } from '@/lib/pricing';
 import type { Sector, Feature } from '@shared/types';
-interface DraftData { businessName: string; sector: Sector; features: Feature[]; brandColor: string; logoUrl?: string; }
+interface DraftData { businessName: string; sector: Sector; features: Feature[]; brandColor: string; logoUrl?: string; customRequest?: string; }
 interface HeroPreview { globalPalette: { primary: string; secondary: string; background: string; text: string }; hero: { headline: string; subheadline: string; ctaText: string; backgroundColor: string; textColor: string; accentColor: string; }; }
 const SECTOR_LABELS: Record<Sector, string> = { beauty: 'Belleza & Spa', restaurant: 'Restaurante', fitness: 'Fitness & Salud', retail: 'Tienda / Retail', professional: 'Servicios Profesionales', education: 'Educacion' };
 export default function ResumenPage() {
@@ -33,7 +33,7 @@ export default function ResumenPage() {
       .finally(() => setIsLoadingPreview(false));
   }, [router, apiUrl]);
   if (!draft) return null;
-  const price = calculatePrice(draft.sector, draft.features);
+  const price = calculatePrice(draft.sector, draft.features, draft.customRequest);
   const handleSubmitLead = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -43,10 +43,10 @@ export default function ResumenPage() {
       const res = await fetch(apiUrl + '/api/generate-layout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(draft) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.detail || 'Error al generar el sitio.');
-      const { projectId } = data;
+      const { projectId, accessToken } = data;
       if (draft.logoUrl) sessionStorage.setItem('editor_logo_' + projectId, draft.logoUrl);
       sessionStorage.removeItem('onboarding_draft');
-      router.push('/editor/' + projectId);
+      router.push('/preview/' + projectId + '?edit=1&token=' + encodeURIComponent(accessToken));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Hubo un error. Intenta de nuevo.');
       setIsGenerating(false);
@@ -93,7 +93,9 @@ export default function ResumenPage() {
               {price.featureLines.map(f => (
                 <div key={f.feature} className="flex justify-between text-sm"><span className="text-slate-400">+ {f.label}</span><span className="font-medium text-white">{formatPrice(f.price)}</span></div>
               ))}
+              {price.customFeaturePrice > 0 && <div className="flex justify-between text-sm"><span className="text-slate-400">+ Propuesta de función especial</span><span className="font-medium text-white">{formatPrice(price.customFeaturePrice)}</span></div>}
             </div>
+            {draft.customRequest && <div className="mb-4 p-3 rounded-xl bg-violet-500/10 border border-violet-500/20 text-sm"><p className="text-violet-300 font-semibold mb-1">Solicitud especial</p><p className="text-slate-400">{draft.customRequest}</p><p className="text-xs text-slate-600 mt-2">Incluye propuesta visual; implementación final sujeta a revisión.</p></div>}
             <div className="pt-4 border-t border-white/10 flex justify-between items-baseline">
               <span className="font-semibold text-white">Total estimado</span>
               <span className="text-3xl font-bold" style={{ color: draft.brandColor }}>{formatPrice(price.total)}</span>

@@ -6,13 +6,13 @@ import type { WebsiteProject } from '@shared/types';
 
 interface EditorPageProps {
   params: { id: string };
-  searchParams: { logoUrl?: string };
+  searchParams: { logoUrl?: string; token?: string };
 }
 
-async function getProject(id: string): Promise<WebsiteProject | null> {
+async function getProject(id: string, token?: string, isAdmin = false): Promise<WebsiteProject | null> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    const res = await fetch(`${apiUrl}/api/projects/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${apiUrl}/api/projects/${id}`, { cache: 'no-store', headers: isAdmin ? { 'x-admin-key': process.env.ADMIN_API_KEY || '' } : token ? { 'x-project-token': token } : {} });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -21,10 +21,8 @@ async function getProject(id: string): Promise<WebsiteProject | null> {
 }
 
 export default async function EditorPage({ params, searchParams }: EditorPageProps) {
-  const [project, session] = await Promise.all([
-    getProject(params.id),
-    getServerSession(authOptions),
-  ]);
+  const session = await getServerSession(authOptions);
+  const project = await getProject(params.id, searchParams.token, Boolean(session));
   if (!project) notFound();
 
   const logoUrl = searchParams?.logoUrl;

@@ -35,7 +35,7 @@ export function LiveEditor({ initialProject, logoUrl, isAdmin = false }: LiveEdi
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       void fetch(`${apiUrl}/api/projects/${initialProject.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(initialProject.accessToken ? { 'x-project-token': initialProject.accessToken } : {}) },
         body: JSON.stringify({ logoUrl: value }),
       });
     };
@@ -107,6 +107,7 @@ export function LiveEditor({ initialProject, logoUrl, isAdmin = false }: LiveEdi
             )}
           </div>
           <div className="flex gap-2">
+            <a href={`/preview/${state.project.id}${state.project.accessToken ? `?token=${encodeURIComponent(state.project.accessToken)}` : ''}`} target="_blank" rel="noreferrer" className="px-4 py-2 border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Vista pública</a>
             {isAdmin && (
               <ExportButton projectId={state.project.id} businessName={state.project.businessName} logoUrl={resolvedLogoUrl} />
             )}

@@ -74,6 +74,7 @@ export function OnboardingForm() {
   const [features, setFeatures]         = useState<Feature[]>([]);
   const [brandColor, setBrandColor]     = useState<string | null>(null);
   const [logoUrl, setLogoUrl]           = useState<string | null>(null);
+  const [customRequest, setCustomRequest] = useState('');
 
   const toggleFeature = (f: Feature) =>
     setFeatures(prev => prev.includes(f) ? prev.filter(x => x !== f) : [...prev, f]);
@@ -83,7 +84,7 @@ export function OnboardingForm() {
   const handleGoToSummary = () => {
     if (!sector || !businessName || !brandColor) return;
     sessionStorage.setItem('onboarding_draft', JSON.stringify({
-      businessName, sector, features, brandColor, logoUrl,
+      businessName, sector, features, brandColor, logoUrl, customRequest: customRequest.trim() || undefined,
     }));
     router.push('/onboarding/resumen');
   };
@@ -316,6 +317,21 @@ export function OnboardingForm() {
             </div>
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 mb-8">
               <LogoUpload value={logoUrl} onChange={setLogoUrl} />
+            </div>
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 mb-8">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <h2 className="font-bold">¿Necesitas alguna función especial?</h2>
+                <span className="text-xs text-slate-500">Opcional</span>
+              </div>
+              <p className="text-sm text-slate-400 mb-4">La IA preparará una propuesta visual para que podamos revisarla y cotizar su desarrollo.</p>
+              <textarea
+                value={customRequest}
+                onChange={e => setCustomRequest(e.target.value.slice(0, 500))}
+                rows={4}
+                placeholder="Ej: Agrega inicio de sesión y un panel donde mis clientes consulten sus citas..."
+                className="w-full resize-none rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+              />
+              <div className="flex justify-between mt-2 text-xs text-slate-500"><span>Generaremos una demostración, no la función definitiva.</span><span>{customRequest.length}/500</span></div>
             </div>
             {logoUrl && (
               <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center gap-3">

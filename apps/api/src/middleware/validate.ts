@@ -24,4 +24,5 @@ export const generateLayoutSchema = z.object({
               .min(0).max(10),
   brandColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color HEX inválido').optional(),
   logoUrl: z.string().url('URL de logo inválida').max(2048).optional().nullable(),
+  customRequest: z.string().trim().max(500, 'La solicitud especial es demasiado larga').optional(),
 });

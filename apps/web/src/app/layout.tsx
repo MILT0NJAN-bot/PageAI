@@ -6,7 +6,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'SiteBuilder AI — Crea tu sitio web en minutos',
+  title: 'Page AI — Crea tu sitio web en minutos',
   description: 'Genera un sitio web profesional con inteligencia artificial. Sin código, sin diseñador.',
 };
 

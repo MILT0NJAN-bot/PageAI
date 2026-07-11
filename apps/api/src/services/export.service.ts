@@ -237,6 +237,11 @@ function generatePricingHTML(data: any): string {
   </section>`;
 }
 
+function generateCustomFeatureHTML(data: any): string {
+  const modules = (data.modules || []).map((module: string) => `<div style="padding:22px;background:#ffffff0d;border:1px solid #ffffff1a;border-radius:16px;font-weight:700;text-transform:capitalize;">${module.replace('_', ' ')}</div>`).join('');
+  return `<section style="background:${data.backgroundColor};color:${data.textColor};padding:100px 24px;"><div style="max-width:1000px;margin:auto;text-align:center;"><span style="display:inline-block;background:${data.accentColor};color:#fff;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:800;">PROPUESTA PERSONALIZADA</span><h2 style="font-size:clamp(2rem,5vw,3.5rem);margin:22px 0 12px;">${data.title}</h2><p style="opacity:.7;margin-bottom:40px;">${data.description}</p><div style="background:#0f172a;color:white;padding:28px;border-radius:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;text-align:left;">${modules}</div><div style="margin-top:22px;padding:18px;border:1px solid ${data.accentColor}55;background:${data.accentColor}12;border-radius:16px;text-align:left;"><strong>Solicitud:</strong> “${data.request}”<br><small>${data.demoNotice}</small></div></div></section>`;
+}
+
 function renderBlock(block: Block, logoUrl?: string): string {
   switch (block.type) {
     case 'hero':         return generateHeroHTML(block.data, logoUrl);
@@ -245,6 +250,7 @@ function renderBlock(block: Block, logoUrl?: string): string {
     case 'contact':      return generateContactHTML(block.data);
     case 'testimonials': return generateTestimonialsHTML(block.data);
     case 'pricing':      return generatePricingHTML(block.data);
+    case 'custom_feature': return generateCustomFeatureHTML(block.data);
     default:             return '';
   }
 }

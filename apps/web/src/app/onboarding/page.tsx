@@ -1,6 +1,6 @@
 import { OnboardingForm } from '@/components/onboarding/OnboardingForm';
 
-export const metadata = { title: 'Crea tu sitio — MiltonDev' };
+export const metadata = { title: 'Crea tu sitio — Page AI' };
 
 export default function OnboardingPage() {
   return (

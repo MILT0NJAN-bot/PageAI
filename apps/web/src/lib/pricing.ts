@@ -33,6 +33,7 @@ export interface PriceBreakdown {
   base: number;
   featuresTotal: number;
   featureLines: Array<{ feature: Feature; label: string; price: number }>;
+  customFeaturePrice: number;
   total: number;
 }
 
@@ -49,7 +50,7 @@ const FEATURE_LABELS: Record<Feature, string> = {
   testimonials:   'Sección de testimonios',
 };
 
-export function calculatePrice(sector: Sector, features: Feature[]): PriceBreakdown {
+export function calculatePrice(sector: Sector, features: Feature[], customRequest?: string): PriceBreakdown {
   const base = BASE_PRICE_BY_SECTOR[sector];
 
   const featureLines = features.map(f => ({
@@ -59,12 +60,14 @@ export function calculatePrice(sector: Sector, features: Feature[]): PriceBreakd
   }));
 
   const featuresTotal = featureLines.reduce((sum, f) => sum + f.price, 0);
+  const customFeaturePrice = customRequest?.trim() ? 1500 : 0;
 
   return {
     base,
     featuresTotal,
     featureLines,
-    total: base + featuresTotal,
+    customFeaturePrice,
+    total: base + featuresTotal + customFeaturePrice,
   };
 }
 

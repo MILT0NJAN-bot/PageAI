@@ -15,6 +15,12 @@ model Project {
   blocks        Json
   globalPalette Json
   logoUrl       String?  @db.Text
+  customRequest String?  @db.Text
+  accessToken   String   @unique @default(uuid())
+  status        String   @default("NEW")
+  adminNotes    String?  @db.Text
+  estimatedPrice Int?
+  finalPrice    Int?
   publishedUrl  String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

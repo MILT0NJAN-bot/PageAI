@@ -5,11 +5,12 @@ import { rateLimitGenerate } from '../middleware/rateLimit';
 import { generateWebsiteLayout } from '../services/ai.service';
 import { db } from '../db/client';
 import type { Block } from '@shared/types';
+import { createCustomFeatureData } from '../services/customFeature.service';
 
 export const generateRouter = Router();
 
 generateRouter.post('/', rateLimitGenerate, validate(generateLayoutSchema), async (req, res) => {
-  const { businessName, sector, features, brandColor, logoUrl } = req.body;
+  const { businessName, sector, features, brandColor, logoUrl, customRequest } = req.body;
 
   try {
     console.log(`[generate] Generando layout para "${businessName}" (${sector})`);
@@ -23,6 +24,16 @@ generateRouter.post('/', rateLimitGenerate, validate(generateLayoutSchema), asyn
       data: b.data as any,
     }));
 
+    if (customRequest) {
+      blocks.push({
+        id: `block_${Date.now()}_custom`,
+        type: 'custom_feature',
+        order: blocks.length,
+        isVisible: true,
+        data: createCustomFeatureData(customRequest, aiLayout.globalPalette),
+      });
+    }
+
     const project = await db.project.create({
       data: {
         businessName,
@@ -31,12 +42,14 @@ generateRouter.post('/', rateLimitGenerate, validate(generateLayoutSchema), asyn
         globalPalette: aiLayout.globalPalette as any,
         blocks: blocks as any,
         logoUrl: logoUrl || null,
+        customRequest: customRequest || null,
       },
     });
 
     console.log(`[generate] Proyecto creado: ${project.id}`);
     res.status(201).json({
       projectId: project.id,
+      accessToken: project.accessToken,
       blocks,
       globalPalette: aiLayout.globalPalette,
     });

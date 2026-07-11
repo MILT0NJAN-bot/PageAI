@@ -6,7 +6,7 @@ import Link from 'next/link';
 async function getProjects() {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    const res = await fetch(`${apiUrl}/api/projects?limit=50`, { cache: 'no-store' });
+    const res = await fetch(`${apiUrl}/api/projects?limit=50`, { cache: 'no-store', headers: { 'x-admin-key': process.env.ADMIN_API_KEY || '' } });
     if (!res.ok) return [];
     const data = await res.json();
     return data.projects || [];
@@ -44,9 +44,9 @@ export default async function AdminPage() {
       <nav className="border-b border-white/5 bg-slate-900/50 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-sm">M</div>
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-sm">P</div>
             <div>
-              <p className="font-bold text-sm">MiltonDev Admin</p>
+              <p className="font-bold text-sm">Page AI Admin</p>
               <p className="text-slate-400 text-xs">{session.user?.email}</p>
             </div>
           </div>
@@ -97,8 +97,11 @@ export default async function AdminPage() {
                           {new Date(project.createdAt).toLocaleDateString('es-MX')}
                         </span>
                       </div>
+                      {project.customRequest && <p className="mt-2 max-w-xs truncate text-xs text-violet-400" title={project.customRequest}>Solicitud especial: {project.customRequest}</p>}
                     </div>
                     <div className="flex gap-2">
+                      <Link href={'/admin/projects/' + project.id} className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white rounded-lg text-xs font-medium transition-colors">Ficha</Link>
+                      <Link href={'/preview/' + project.id + '?token=' + encodeURIComponent(project.accessToken)} target="_blank" className="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white rounded-lg text-xs font-medium transition-colors">Vista</Link>
                       <Link
                         href={'/editor/' + project.id}
                         className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors"
@@ -106,7 +109,7 @@ export default async function AdminPage() {
                         Editar
                       </Link>
                       <a
-                        href={(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + '/api/projects/' + project.id + '/export'}
+                        href={'/api/admin/projects/' + project.id + '/export'}
                         className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-medium transition-colors"
                         download
                       >

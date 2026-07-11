@@ -1,0 +1,5 @@
+'use client';
+import type { TestimonialsBlockData } from '@shared/types';
+export function TestimonialsBlock({ data }: { data: TestimonialsBlockData }) {
+  return <section className="px-6 py-24" style={{ backgroundColor: data.backgroundColor, color: data.textColor }}><div className="max-w-6xl mx-auto"><div className="text-center mb-14"><div className="w-12 h-1 rounded-full mx-auto mb-5" style={{ backgroundColor: data.accentColor }} /><h2 className="text-3xl md:text-5xl font-black mb-4">{data.title}</h2><p className="opacity-65 text-lg">{data.subtitle}</p></div><div className="grid md:grid-cols-3 gap-6">{data.items.map(item => <article key={item.id} className="rounded-3xl p-7 shadow-lg border border-black/5" style={{ backgroundColor: data.cardBackgroundColor }}><div className="text-amber-400 tracking-widest mb-5">{'★'.repeat(item.rating)}</div><p className="leading-7 opacity-75 mb-6">“{item.text}”</p><div><p className="font-black">{item.name}</p><p className="text-sm opacity-50">{item.role}</p></div></article>)}</div></div></section>;
+}

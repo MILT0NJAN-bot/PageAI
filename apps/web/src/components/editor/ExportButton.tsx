@@ -14,13 +14,7 @@ export function ExportButton({ projectId, businessName, logoUrl }: ExportButtonP
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-      // Pasa el logoUrl como query param para que el exportador lo incluya en el HTML
-      const params = new URLSearchParams();
-      if (logoUrl) params.set('logoUrl', logoUrl);
-
-      const url = `${apiUrl}/api/projects/${projectId}/export${logoUrl ? `?${params}` : ''}`;
+      const url = `/api/admin/projects/${projectId}/export`;
       const res = await fetch(url);
 
       if (!res.ok) throw new Error('Error al exportar');

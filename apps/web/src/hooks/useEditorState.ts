@@ -153,7 +153,7 @@ export function useEditorState() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       await fetch(`${apiUrl}/api/projects/${state.project.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(state.project.accessToken ? { 'x-project-token': state.project.accessToken } : {}) },
         body: JSON.stringify(state.project),
       });
     } finally {

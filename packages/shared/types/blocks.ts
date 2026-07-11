@@ -32,7 +32,10 @@ export type BlockType =
   | 'pricing'
   | 'testimonials'
   | 'location'
-  | 'social_links';
+  | 'social_links'
+  | 'custom_feature';
+
+export type CustomModule = 'login' | 'dashboard' | 'appointments' | 'orders' | 'memberships' | 'courses' | 'quotes' | 'catalog' | 'custom';
 
 // ── Data shapes para cada bloque ───────────────────────────────
 
@@ -133,6 +136,15 @@ export interface TestimonialsBlockData extends BaseBlockData {
   cardBackgroundColor: string;
 }
 
+export interface CustomFeatureBlockData extends BaseBlockData {
+  title: string;
+  description: string;
+  request: string;
+  modules: CustomModule[];
+  demoNotice: string;
+  loginButtonText: string;
+}
+
 // ── Block: unión discriminada tipada ───────────────────────────
 // Permite al compilador saber exactamente qué está en `data`
 // según el valor de `type`, sin necesidad de casteos.
@@ -143,7 +155,8 @@ export type Block =
   | { id: string; type: 'gallery';      order: number; isVisible: boolean; data: GalleryBlockData }
   | { id: string; type: 'contact';      order: number; isVisible: boolean; data: ContactBlockData }
   | { id: string; type: 'pricing';      order: number; isVisible: boolean; data: PricingBlockData }
-  | { id: string; type: 'testimonials'; order: number; isVisible: boolean; data: TestimonialsBlockData };
+  | { id: string; type: 'testimonials'; order: number; isVisible: boolean; data: TestimonialsBlockData }
+  | { id: string; type: 'custom_feature'; order: number; isVisible: boolean; data: CustomFeatureBlockData };
 
 // ── Global palette ─────────────────────────────────────────────
 
@@ -164,6 +177,12 @@ export interface WebsiteProject {
   blocks: Block[];
   globalPalette: GlobalPalette;
   logoUrl?: string;
+  customRequest?: string;
+  accessToken?: string;
+  status?: 'NEW' | 'CONTACTED' | 'QUOTED' | 'APPROVED' | 'IN_PROGRESS' | 'WAITING_CLIENT' | 'PUBLISHED' | 'ARCHIVED';
+  adminNotes?: string;
+  estimatedPrice?: number;
+  finalPrice?: number;
   publishedUrl?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -176,6 +195,8 @@ export interface OnboardingPayload {
   sector: Sector;
   features: Feature[];
   brandColor?: string;
+  logoUrl?: string;
+  customRequest?: string;
 }
 
 // ── Respuesta de la IA (contrato del prompt) ───────────────────
@@ -186,6 +207,6 @@ export interface AIGeneratedLayout {
   blocks: Array<{
     type: BlockType;
     data: HeroBlockData | ServicesBlockData | GalleryBlockData |
-          ContactBlockData | PricingBlockData | TestimonialsBlockData;
+          ContactBlockData | PricingBlockData | TestimonialsBlockData | CustomFeatureBlockData;
   }>;
 }

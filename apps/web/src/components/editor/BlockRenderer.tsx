@@ -6,6 +6,9 @@ import { HeroBlock }     from '@/components/blocks/HeroBlock';
 import { ServicesBlock } from '@/components/blocks/ServicesBlock';
 import { GalleryBlock }  from '@/components/blocks/GalleryBlock';
 import { ContactBlock }  from '@/components/blocks/ContactBlock';
+import { CustomFeatureBlock } from '@/components/blocks/CustomFeatureBlock';
+import { TestimonialsBlock } from '@/components/blocks/TestimonialsBlock';
+import { PricingBlock } from '@/components/blocks/PricingBlock';
 
 // Registry de bloques — añadir aquí nuevos tipos sin tocar el editor
 const BLOCK_REGISTRY: Record<string, React.ComponentType<any>> = {
@@ -13,6 +16,9 @@ const BLOCK_REGISTRY: Record<string, React.ComponentType<any>> = {
   services: ServicesBlock,
   gallery:  GalleryBlock,
   contact:  ContactBlock,
+  custom_feature: CustomFeatureBlock,
+  testimonials: TestimonialsBlock,
+  pricing: PricingBlock,
 };
 
 interface BlockRendererProps {
