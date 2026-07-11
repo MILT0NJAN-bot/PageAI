@@ -3,12 +3,12 @@
 
 import { Router } from 'express';
 import { validate, generateLayoutSchema } from '../middleware/validate';
-import { rateLimitGenerate } from '../middleware/rateLimit';
+import { rateLimitPreview } from '../middleware/rateLimit';
 import { generateHeroPreview } from '../services/ai.service';
 
 export const previewRouter = Router();
 
-previewRouter.post('/', rateLimitGenerate, validate(generateLayoutSchema), async (req, res) => {
+previewRouter.post('/', rateLimitPreview, validate(generateLayoutSchema), async (req, res) => {
   const { businessName, sector, features, brandColor } = req.body;
 
   try {

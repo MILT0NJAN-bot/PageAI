@@ -33,6 +33,7 @@ projectsRouter.put('/:id', async (req, res) => {
     globalPalette: z.record(z.string()).optional(),
     businessName:  z.string().optional(),
     features:      z.array(z.string()).optional(),
+    logoUrl:       z.string().url().max(2048).optional().nullable(),
   });
 
   const result = updateSchema.safeParse(req.body);
@@ -46,6 +47,7 @@ projectsRouter.put('/:id', async (req, res) => {
         ...(result.data.globalPalette && { globalPalette: result.data.globalPalette as any }),
         ...(result.data.businessName  && { businessName: result.data.businessName }),
         ...(result.data.features      && { features: JSON.stringify(result.data.features) }),
+        ...(result.data.logoUrl !== undefined && { logoUrl: result.data.logoUrl }),
       },
     });
     res.json(deserializeProject(updated));
@@ -75,7 +77,7 @@ projectsRouter.get('/', async (req, res) => {
       db.project.findMany({
         skip: (page - 1) * limit, take: limit,
         orderBy: { createdAt: 'desc' },
-        select: { id: true, businessName: true, sector: true, features: true, createdAt: true, publishedUrl: true },
+        select: { id: true, businessName: true, sector: true, features: true, logoUrl: true, createdAt: true, publishedUrl: true },
       }),
       db.project.count(),
     ]);

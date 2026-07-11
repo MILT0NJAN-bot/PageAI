@@ -23,4 +23,5 @@ export const generateLayoutSchema = z.object({
                               'menu', 'reservations', 'location', 'pricing', 'testimonials']))
               .min(0).max(10),
   brandColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color HEX inválido').optional(),
+  logoUrl: z.string().url('URL de logo inválida').max(2048).optional().nullable(),
 });

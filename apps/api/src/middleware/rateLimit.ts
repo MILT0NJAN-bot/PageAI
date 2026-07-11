@@ -1,11 +1,6 @@
-// middleware/rateLimit.ts
-// Limita generaciones por IP — protección simple contra abuso de tokens.
-// En memoria para MVP; si escalas a múltiples instancias, migra a Redis.
-
 import { Request, Response, NextFunction } from 'express';
 
-const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 horas
-const MAX_REQUESTS = 5; // Máximo de generaciones gratis por IP al día
+const WINDOW_MS = 24 * 60 * 60 * 1000;
 
 interface RateRecord {
   count: number;
@@ -14,38 +9,41 @@ interface RateRecord {
 
 const store = new Map<string, RateRecord>();
 
-// Limpieza periódica de registros vencidos para no crecer infinito en memoria
 setInterval(() => {
   const now = Date.now();
-  for (const [ip, record] of store.entries()) {
-    if (record.resetAt < now) store.delete(ip);
+  for (const [key, record] of store.entries()) {
+    if (record.resetAt < now) store.delete(key);
   }
-}, 60 * 60 * 1000); // cada hora
+}, 60 * 60 * 1000);
 
-export function rateLimitGenerate(req: Request, res: Response, next: NextFunction) {
-  // Detecta IP real considerando proxies (Vercel, nginx, etc.)
-  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
-    || req.socket.remoteAddress
-    || 'unknown';
+function createRateLimit(scope: string, maxRequests: number, resourceName: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
+      || req.socket.remoteAddress
+      || 'unknown';
+    const key = `${scope}:${ip}`;
+    const now = Date.now();
+    const record = store.get(key);
 
-  const now = Date.now();
-  const record = store.get(ip);
+    if (!record || record.resetAt < now) {
+      store.set(key, { count: 1, resetAt: now + WINDOW_MS });
+      return next();
+    }
 
-  if (!record || record.resetAt < now) {
-    // Primera solicitud o ventana expirada — reinicia el contador
-    store.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return next();
-  }
+    if (record.count >= maxRequests) {
+      const hoursLeft = Math.ceil((record.resetAt - now) / (60 * 60 * 1000));
+      return res.status(429).json({
+        error: `Límite de ${resourceName} alcanzado`,
+        message: `Has alcanzado el límite de ${maxRequests} ${resourceName} hoy. Intenta de nuevo en ${hoursLeft} horas.`,
+        retryAfterHours: hoursLeft,
+      });
+    }
 
-  if (record.count >= MAX_REQUESTS) {
-    const hoursLeft = Math.ceil((record.resetAt - now) / (60 * 60 * 1000));
-    return res.status(429).json({
-      error: 'Límite de generaciones alcanzado',
-      message: `Has alcanzado el límite de ${MAX_REQUESTS} sitios generados hoy. Intenta de nuevo en ${hoursLeft} horas.`,
-      retryAfterHours: hoursLeft,
-    });
-  }
-
-  record.count += 1;
-  next();
+    record.count += 1;
+    next();
+  };
 }
+
+// Una preview nunca consume el cupo reservado para generar el sitio completo.
+export const rateLimitPreview = createRateLimit('preview', 20, 'vistas previas');
+export const rateLimitGenerate = createRateLimit('layout', 5, 'sitios generados');

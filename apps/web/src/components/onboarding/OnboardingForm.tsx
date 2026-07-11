@@ -1,4 +1,3 @@
-// components/onboarding/OnboardingForm.tsx
 'use client';
 
 import { useState } from 'react';
@@ -7,53 +6,51 @@ import { useRouter } from 'next/navigation';
 import { ColorPicker } from './ColorPicker';
 import { LogoUpload } from './LogoUpload';
 
-// ── Datos estáticos del formulario ─────────────────────────────
-
 const SECTORS: { value: Sector; label: string; icon: string; description: string }[] = [
-  { value: 'beauty',       label: 'Belleza & Spa',    icon: '💅', description: 'Salón, estética, spa' },
-  { value: 'restaurant',   label: 'Restaurante',      icon: '🍽️', description: 'Comida, café, bar' },
-  { value: 'fitness',      label: 'Fitness & Salud',  icon: '💪', description: 'Gym, yoga, nutrición' },
+  { value: 'beauty',       label: 'Belleza & Spa',    icon: '💅', description: 'Salon, estetica, spa' },
+  { value: 'restaurant',   label: 'Restaurante',      icon: '🍽️', description: 'Comida, cafe, bar' },
+  { value: 'fitness',      label: 'Fitness & Salud',  icon: '💪', description: 'Gym, yoga, nutricion' },
   { value: 'retail',       label: 'Tienda / Retail',  icon: '🛍️', description: 'Ropa, productos, hogar' },
-  { value: 'professional', label: 'Servicios Prof.',  icon: '💼', description: 'Consultoría, legal, contable' },
-  { value: 'education',    label: 'Educación',        icon: '📚', description: 'Academia, clases, cursos' },
+  { value: 'professional', label: 'Servicios Prof.',  icon: '💼', description: 'Consultoria, legal, contable' },
+  { value: 'education',    label: 'Educacion',        icon: '📚', description: 'Academia, clases, cursos' },
 ];
 
 const FEATURES_BY_SECTOR: Record<Sector, { value: Feature; label: string; icon: string }[]> = {
   beauty: [
     { value: 'booking',       label: 'Agendar Citas',       icon: '📅' },
-    { value: 'gallery',       label: 'Galería de Trabajos', icon: '🖼️' },
+    { value: 'gallery',       label: 'Galeria de Trabajos', icon: '🖼️' },
     { value: 'services_list', label: 'Lista de Servicios',  icon: '📋' },
     { value: 'social',        label: 'Redes Sociales',      icon: '📱' },
-    { value: 'whatsapp',      label: 'Botón WhatsApp',      icon: '💬' },
-    { value: 'testimonials',  label: 'Reseñas de Clientes', icon: '⭐' },
+    { value: 'whatsapp',      label: 'Boton WhatsApp',      icon: '💬' },
+    { value: 'testimonials',  label: 'Resenas de Clientes', icon: '⭐' },
   ],
   restaurant: [
-    { value: 'menu',          label: 'Menú Digital',        icon: '🍴' },
+    { value: 'menu',          label: 'Menu Digital',        icon: '🍴' },
     { value: 'reservations',  label: 'Reservaciones',       icon: '📅' },
     { value: 'gallery',       label: 'Fotos del Lugar',     icon: '🖼️' },
-    { value: 'location',      label: 'Ubicación / Mapa',    icon: '📍' },
+    { value: 'location',      label: 'Ubicacion / Mapa',    icon: '📍' },
     { value: 'social',        label: 'Redes Sociales',      icon: '📱' },
-    { value: 'testimonials',  label: 'Reseñas',             icon: '⭐' },
+    { value: 'testimonials',  label: 'Resenas',             icon: '⭐' },
   ],
   fitness: [
     { value: 'booking',       label: 'Agendar Clases',      icon: '📅' },
     { value: 'pricing',       label: 'Planes y Precios',    icon: '💰' },
-    { value: 'gallery',       label: 'Galería',             icon: '🖼️' },
+    { value: 'gallery',       label: 'Galeria',             icon: '🖼️' },
     { value: 'testimonials',  label: 'Testimonios',         icon: '⭐' },
     { value: 'social',        label: 'Redes Sociales',      icon: '📱' },
     { value: 'whatsapp',      label: 'WhatsApp',            icon: '💬' },
   ],
   retail: [
-    { value: 'gallery',       label: 'Catálogo de Productos', icon: '🖼️' },
+    { value: 'gallery',       label: 'Catalogo de Productos', icon: '🖼️' },
     { value: 'whatsapp',      label: 'Comprar por WhatsApp',  icon: '💬' },
     { value: 'social',        label: 'Redes Sociales',        icon: '📱' },
-    { value: 'location',      label: 'Ubicación de Tienda',   icon: '📍' },
-    { value: 'testimonials',  label: 'Reseñas',               icon: '⭐' },
+    { value: 'location',      label: 'Ubicacion de Tienda',   icon: '📍' },
+    { value: 'testimonials',  label: 'Resenas',               icon: '⭐' },
   ],
   professional: [
     { value: 'services_list', label: 'Servicios',           icon: '📋' },
     { value: 'booking',       label: 'Agendar Consulta',    icon: '📅' },
-    { value: 'testimonials',  label: 'Casos de Éxito',      icon: '⭐' },
+    { value: 'testimonials',  label: 'Casos de Exito',      icon: '⭐' },
     { value: 'pricing',       label: 'Planes / Tarifas',    icon: '💰' },
     { value: 'social',        label: 'LinkedIn / Redes',    icon: '📱' },
   ],
@@ -61,13 +58,13 @@ const FEATURES_BY_SECTOR: Record<Sector, { value: Feature; label: string; icon: 
     { value: 'services_list', label: 'Cursos y Programas',  icon: '📚' },
     { value: 'pricing',       label: 'Inscripciones',       icon: '💰' },
     { value: 'booking',       label: 'Clase de Prueba',     icon: '📅' },
-    { value: 'gallery',       label: 'Galería',             icon: '🖼️' },
+    { value: 'gallery',       label: 'Galeria',             icon: '🖼️' },
     { value: 'testimonials',  label: 'Testimonios',         icon: '⭐' },
     { value: 'social',        label: 'Redes Sociales',      icon: '📱' },
   ],
 };
 
-// ── Componente ─────────────────────────────────────────────────
+const STEP_LABELS = ['Nombre', 'Sector', 'Funciones', 'Color', 'Logo'];
 
 export function OnboardingForm() {
   const router = useRouter();
@@ -81,10 +78,7 @@ export function OnboardingForm() {
   const toggleFeature = (f: Feature) =>
     setFeatures(prev => prev.includes(f) ? prev.filter(x => x !== f) : [...prev, f]);
 
-  const handleSectorChange = (s: Sector) => {
-    setSector(s);
-    setFeatures([]);
-  };
+  const handleSectorChange = (s: Sector) => { setSector(s); setFeatures([]); };
 
   const handleGoToSummary = () => {
     if (!sector || !businessName || !brandColor) return;
@@ -98,178 +92,250 @@ export function OnboardingForm() {
   const canGoToStep2 = businessName.trim().length >= 2;
   const canGoToStep3 = !!sector;
   const canGoToStep4 = canGoToStep3 && features.length >= 1;
-  const canSubmit     = canGoToStep4 && !!brandColor;
+  const canGoToStep5 = canGoToStep4 && !!brandColor;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      {/* Barra de progreso */}
-      <div className="flex border-b border-slate-100">
-        {[1, 2, 3, 4, 5].map(s => (
-          <div key={s} className={`flex-1 py-3 text-center text-xs sm:text-sm font-medium transition-colors
-            ${step >= s ? 'text-blue-600 bg-blue-50' : 'text-slate-400'}`}>
-            {s === 1 && '① Nombre'}
-            {s === 2 && '② Sector'}
-            {s === 3 && '③ Funciones'}
-            {s === 4 && '④ Color'}
-            {s === 5 && '⑤ Logo'}
+    <div className="bg-slate-950 min-h-screen text-white">
+      {/* Header con progreso */}
+      <div className="border-b border-white/5 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-slate-400">
+              Paso <span className="text-white font-semibold">{step}</span> de 5
+            </span>
+            <span className="text-sm font-medium text-blue-400">{STEP_LABELS[step - 1]}</span>
           </div>
-        ))}
+          {/* Barra de progreso */}
+          <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-500"
+              style={{ width: `${(step / 5) * 100}%` }}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="p-8">
-        {/* PASO 1: Nombre del negocio */}
+      <div className="max-w-2xl mx-auto px-6 py-12">
+
+        {/* PASO 1 */}
         {step === 1 && (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">¿Cómo se llama tu negocio?</h2>
-            <p className="text-slate-500 mb-8">Lo usaremos para personalizar todo tu sitio.</p>
+          <div>
+            <div className="mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-medium mb-6">
+                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                Empecemos
+              </div>
+              <h1 className="text-4xl font-black mb-3 tracking-tight">
+                Como se llama tu negocio?
+              </h1>
+              <p className="text-slate-400 text-lg">Lo usaremos para personalizar cada texto de tu sitio.</p>
+            </div>
             <input
               type="text"
               autoFocus
-              placeholder="Ej: Salón Valentina, Tacos El Gordo, Studio Fit..."
+              placeholder="Ej: Salon Valentina, Tacos El Gordo, Studio Fit..."
               value={businessName}
               onChange={e => setBusinessName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && canGoToStep2 && setStep(2)}
-              className="w-full px-5 py-4 rounded-xl border-2 border-slate-200 
-                         focus:border-blue-500 focus:outline-none text-lg transition-colors"
+              className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-xl placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-colors mb-6"
             />
+            {businessName.length > 0 && (
+              <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center gap-3">
+                <span className="text-2xl">👋</span>
+                <p className="text-blue-300 text-sm">
+                  Genial, crearemos el sitio perfecto para <span className="font-bold text-white">{businessName}</span>
+                </p>
+              </div>
+            )}
             <button
               onClick={() => setStep(2)}
               disabled={!canGoToStep2}
-              className="mt-6 w-full py-4 bg-blue-600 text-white rounded-xl font-semibold
-                         text-lg disabled:opacity-40 disabled:cursor-not-allowed
-                         hover:bg-blue-700 transition-colors"
+              className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
             >
-              Continuar →
+              Continuar
             </button>
           </div>
         )}
 
-        {/* PASO 2: Selección de sector */}
+        {/* PASO 2 */}
         {step === 2 && (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">¿Cuál es tu sector?</h2>
-            <p className="text-slate-500 mb-8">Elegimos la paleta de colores y contenido apropiados para tu industria.</p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+          <div>
+            <div className="mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-medium mb-6">
+                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                Sector
+              </div>
+              <h1 className="text-4xl font-black mb-3 tracking-tight">Cual es tu sector?</h1>
+              <p className="text-slate-400 text-lg">Esto define el estilo visual y el contenido que generara la IA.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mb-8">
               {SECTORS.map(s => (
                 <button
                   key={s.value}
                   onClick={() => handleSectorChange(s.value)}
-                  className={`flex flex-col items-center gap-2 p-5 rounded-xl border-2 
-                    transition-all duration-200 text-left hover:shadow-md
+                  className={`flex items-center gap-4 p-5 rounded-2xl border text-left transition-all hover:scale-[1.02]
                     ${sector === s.value
-                      ? 'border-blue-500 bg-blue-50 shadow-md shadow-blue-100'
-                      : 'border-slate-200 hover:border-blue-300'}`}
+                      ? 'border-blue-500 bg-blue-500/15 shadow-lg shadow-blue-500/10'
+                      : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'}`}
                 >
-                  <span className="text-3xl">{s.icon}</span>
-                  <span className="font-semibold text-slate-900 text-sm">{s.label}</span>
-                  <span className="text-xs text-slate-400 text-center">{s.description}</span>
+                  <span className="text-3xl flex-shrink-0">{s.icon}</span>
+                  <div>
+                    <p className="font-bold text-white text-sm">{s.label}</p>
+                    <p className="text-slate-500 text-xs mt-0.5">{s.description}</p>
+                  </div>
+                  {sector === s.value && (
+                    <div className="ml-auto w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setStep(1)} className="px-6 py-3 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50">
-                ← Atrás
+              <button onClick={() => setStep(1)} className="px-6 py-4 border border-white/10 rounded-2xl text-slate-400 hover:bg-white/5 transition-colors font-medium">
+                Atras
               </button>
               <button
                 onClick={() => setStep(3)}
                 disabled={!canGoToStep3}
-                className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold
-                           disabled:opacity-40 hover:bg-blue-700 transition-colors"
+                className="flex-1 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-lg disabled:opacity-30 transition-all hover:scale-[1.02]"
               >
-                Continuar →
+                Continuar
               </button>
             </div>
           </div>
         )}
 
-        {/* PASO 3: Funcionalidades */}
+        {/* PASO 3 */}
         {step === 3 && (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">¿Qué necesita tu sitio?</h2>
-            <p className="text-slate-500 mb-8">Selecciona todas las funciones que quieras incluir.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-8">
+          <div>
+            <div className="mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-medium mb-6">
+                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                Funcionalidades
+              </div>
+              <h1 className="text-4xl font-black mb-3 tracking-tight">Que necesita tu sitio?</h1>
+              <p className="text-slate-400 text-lg">Cada funcion que elijas aumenta el precio estimado.</p>
+            </div>
+            <div className="grid grid-cols-1 gap-2 mb-8">
               {availableFeatures.map(f => (
-                <label key={f.value}
-                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer
-                    transition-all hover:shadow-sm
+                <label
+                  key={f.value}
+                  className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01]
                     ${features.includes(f.value)
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-slate-200 hover:border-blue-300'}`}>
+                      ? 'border-blue-500 bg-blue-500/10'
+                      : 'border-white/10 bg-white/[0.03] hover:border-white/20'}`}
+                >
                   <input
                     type="checkbox"
                     checked={features.includes(f.value)}
                     onChange={() => toggleFeature(f.value)}
                     className="sr-only"
                   />
-                  <span className={`w-5 h-5 rounded flex items-center justify-center border-2 flex-shrink-0
-                    ${features.includes(f.value) ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`}>
-                    {features.includes(f.value) && <span className="text-white text-xs">✓</span>}
-                  </span>
-                  <span className="text-lg">{f.icon}</span>
-                  <span className="font-medium text-slate-800">{f.label}</span>
+                  <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all
+                    ${features.includes(f.value) ? 'bg-blue-600 border-blue-600' : 'border-white/20'}`}>
+                    {features.includes(f.value) && <span className="text-white text-xs font-bold">✓</span>}
+                  </div>
+                  <span className="text-2xl flex-shrink-0">{f.icon}</span>
+                  <span className="font-medium text-white">{f.label}</span>
+                  {features.includes(f.value) && (
+                    <span className="ml-auto text-xs text-blue-400 font-medium">Incluido</span>
+                  )}
                 </label>
               ))}
             </div>
+            {features.length > 0 && (
+              <div className="mb-6 p-4 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between">
+                <span className="text-slate-400 text-sm">{features.length} funcion{features.length !== 1 ? 'es' : ''} seleccionada{features.length !== 1 ? 's' : ''}</span>
+                <span className="text-blue-400 text-sm font-medium">Ver precio en el resumen</span>
+              </div>
+            )}
             <div className="flex gap-3">
-              <button onClick={() => setStep(2)} className="px-6 py-3 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50">
-                ← Atrás
+              <button onClick={() => setStep(2)} className="px-6 py-4 border border-white/10 rounded-2xl text-slate-400 hover:bg-white/5 transition-colors font-medium">
+                Atras
               </button>
               <button
                 onClick={() => setStep(4)}
                 disabled={!canGoToStep4}
-                className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold
-                           disabled:opacity-40 hover:bg-blue-700 transition-colors"
+                className="flex-1 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-lg disabled:opacity-30 transition-all hover:scale-[1.02]"
               >
-                Continuar →
+                Continuar
               </button>
             </div>
           </div>
         )}
 
-        {/* PASO 4: Color de marca */}
+        {/* PASO 4 */}
         {step === 4 && (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Elige tu color de marca</h2>
-            <p className="text-slate-500 mb-8">Usaremos este color como base para toda la paleta de tu sitio.</p>
-
-            <ColorPicker value={brandColor} onChange={setBrandColor} />
-
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(3)} className="px-6 py-3 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50">
-                ← Atrás
+          <div>
+            <div className="mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-medium mb-6">
+                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                Identidad visual
+              </div>
+              <h1 className="text-4xl font-black mb-3 tracking-tight">Elige tu color de marca</h1>
+              <p className="text-slate-400 text-lg">La IA construira toda la paleta en armonia con este color.</p>
+            </div>
+            {brandColor && (
+              <div className="mb-6 p-4 rounded-2xl border border-white/10 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl flex-shrink-0 shadow-lg" style={{ backgroundColor: brandColor }} />
+                <div>
+                  <p className="font-semibold text-white">Color seleccionado</p>
+                  <p className="text-slate-400 font-mono text-sm">{brandColor}</p>
+                </div>
+              </div>
+            )}
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 mb-8">
+              <ColorPicker value={brandColor} onChange={setBrandColor} />
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setStep(3)} className="px-6 py-4 border border-white/10 rounded-2xl text-slate-400 hover:bg-white/5 transition-colors font-medium">
+                Atras
               </button>
               <button
                 onClick={() => setStep(5)}
-                disabled={!canSubmit}
-                className="flex-1 py-4 bg-blue-600 text-white rounded-xl font-semibold text-lg
-                           disabled:opacity-40 disabled:cursor-not-allowed
-                           hover:bg-blue-700 transition-colors"
+                disabled={!canGoToStep5}
+                className="flex-1 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-lg disabled:opacity-30 transition-all hover:scale-[1.02]"
               >
-                Continuar →
+                Continuar
               </button>
             </div>
           </div>
         )}
 
-        {/* PASO 5: Logo (opcional) */}
+        {/* PASO 5 */}
         {step === 5 && (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">¿Tienes un logo?</h2>
-            <p className="text-slate-500 mb-8">
-              Opcional — si no subes uno, generaremos tu sitio sin logo y podrás agregarlo después.
-            </p>
-
-            <LogoUpload value={logoUrl} onChange={setLogoUrl} />
-
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(4)} className="px-6 py-3 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50">
-                ← Atrás
+          <div>
+            <div className="mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-medium mb-6">
+                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                Ultimo paso
+              </div>
+              <h1 className="text-4xl font-black mb-3 tracking-tight">Tienes un logo?</h1>
+              <p className="text-slate-400 text-lg">Opcional — si no tienes, generamos el sitio sin logo y lo agregas despues.</p>
+            </div>
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 mb-8">
+              <LogoUpload value={logoUrl} onChange={setLogoUrl} />
+            </div>
+            {logoUrl && (
+              <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center gap-3">
+                <img src={logoUrl} alt="Logo" className="h-12 w-auto object-contain rounded" />
+                <div>
+                  <p className="text-green-400 font-semibold text-sm">Logo cargado correctamente</p>
+                  <p className="text-slate-500 text-xs">Se integrara en tu sitio web</p>
+                </div>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button onClick={() => setStep(4)} className="px-6 py-4 border border-white/10 rounded-2xl text-slate-400 hover:bg-white/5 transition-colors font-medium">
+                Atras
               </button>
               <button
                 onClick={handleGoToSummary}
-                className="flex-1 py-4 bg-blue-600 text-white rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 py-4 text-white rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] hover:opacity-90"
+                style={{ backgroundColor: brandColor || '#3B82F6' }}
               >
-                Ver resumen y cotización →
+                Ver resumen y cotizacion
               </button>
             </div>
           </div>

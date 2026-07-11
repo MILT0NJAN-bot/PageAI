@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
-  Variables CSS globales del editor.
-  Estas son las únicas variables que los bloques deben usar para sus colores.
-  Se actualizan en tiempo real cuando el usuario cambia la paleta en el editor.
-*/
 :root {
   --color-primary:    #3B82F6;
   --color-secondary:  #10B981;
@@ -14,7 +9,6 @@
   --color-text:       #1A1A1A;
 }
 
-/* Estilos base del editor inline */
 [contenteditable="true"]:focus {
   outline: 2px dashed #3B82F6;
   outline-offset: 4px;
@@ -28,7 +22,116 @@
   cursor: text;
 }
 
-/* Scrollbar personalizado para el editor */
 .editor-canvas::-webkit-scrollbar { width: 6px; }
 .editor-canvas::-webkit-scrollbar-track { background: #f1f5f9; }
 .editor-canvas::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+/* ── Animaciones de entrada ─────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+  50%       { box-shadow: 0 0 40px rgba(59,130,246,0.6); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Clases utilitarias de animacion */
+.animate-fade-in-up    { animation: fadeInUp 0.6s ease both; }
+.animate-fade-in-down  { animation: fadeInDown 0.5s ease both; }
+.animate-fade-in       { animation: fadeIn 0.5s ease both; }
+.animate-scale-in      { animation: scaleIn 0.5s ease both; }
+.animate-slide-left    { animation: slideInLeft 0.6s ease both; }
+.animate-slide-right   { animation: slideInRight 0.6s ease both; }
+.animate-float         { animation: float 3s ease-in-out infinite; }
+.animate-pulse-glow    { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* Delays encadenados */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-800 { animation-delay: 0.8s; }
+
+/* Shimmer gradient para textos */
+.text-shimmer {
+  background: linear-gradient(90deg, #60A5FA, #A78BFA, #34D399, #60A5FA);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Scroll reveal — elementos ocultos hasta que entran al viewport */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.reveal-right {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}

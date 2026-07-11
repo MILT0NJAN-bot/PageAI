@@ -1,5 +1,4 @@
-// components/blocks/ServicesBlock.tsx
-// Bloque de servicios en cuadrícula — 100% props-driven.
+'use client';
 
 import type { ServicesBlockData, ServiceItem } from '@shared/types';
 
@@ -10,7 +9,6 @@ interface ServicesBlockProps {
 }
 
 export function ServicesBlock({ data, isEditable = false, onUpdate }: ServicesBlockProps) {
-  // Actualiza un campo de un ServiceItem por índice
   const updateItem = (index: number, field: keyof ServiceItem, value: string) => {
     if (!onUpdate) return;
     const newItems = data.items.map((item, i) =>
@@ -19,14 +17,16 @@ export function ServicesBlock({ data, isEditable = false, onUpdate }: ServicesBl
     onUpdate('items', newItems);
   };
 
-  const editableProps = (onBlurHandler: React.FocusEventHandler<HTMLElement>) =>
-    isEditable ? { contentEditable: true as const, suppressContentEditableWarning: true, onBlur: onBlurHandler } : {};
+  const editableProps = (handler: React.FocusEventHandler<HTMLElement>) =>
+    isEditable ? { contentEditable: true as const, suppressContentEditableWarning: true, onBlur: handler } : {};
 
   return (
-    <section style={{ backgroundColor: data.backgroundColor, color: data.textColor }} className="py-20 px-6">
+    <section style={{ backgroundColor: data.backgroundColor }} className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header de sección */}
-        <div className="text-center mb-14">
+        {/* Header */}
+        <div className="text-center mb-16">
+          {/* Línea decorativa */}
+          <div style={{ backgroundColor: data.accentColor }} className="w-12 h-1 rounded-full mx-auto mb-6" />
           <h2
             {...editableProps(e => onUpdate?.('title', e.currentTarget.innerText))}
             style={{ color: data.textColor }}
@@ -36,15 +36,15 @@ export function ServicesBlock({ data, isEditable = false, onUpdate }: ServicesBl
           </h2>
           <p
             {...editableProps(e => onUpdate?.('subtitle', e.currentTarget.innerText))}
-            style={{ color: data.textColor, opacity: 0.7 }}
+            style={{ color: data.textColor, opacity: 0.65 }}
             className="text-lg md:text-xl max-w-2xl mx-auto"
           >
             {data.subtitle}
           </p>
         </div>
 
-        {/* Grid de tarjetas de servicio */}
-        <div className={`grid gap-6 ${
+        {/* Grid de tarjetas */}
+        <div className={`grid gap-8 ${
           data.layout === 'list'
             ? 'grid-cols-1 max-w-2xl mx-auto'
             : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
@@ -54,42 +54,44 @@ export function ServicesBlock({ data, isEditable = false, onUpdate }: ServicesBl
               key={item.id}
               style={{
                 backgroundColor: data.cardBackgroundColor,
-                borderColor: `${data.accentColor}30`,
+                borderTop: `4px solid ${data.accentColor}`,
               }}
-              className="rounded-2xl p-6 border hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+              className="rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group"
             >
-              {/* Ícono — viene de props */}
+              {/* Ícono con fondo */}
               <div
                 style={{ backgroundColor: `${data.accentColor}18` }}
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl mb-5"
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform"
               >
                 {item.icon}
               </div>
 
-              {/* Título del servicio — editable */}
               <h3
                 {...editableProps(e => updateItem(index, 'title', e.currentTarget.innerText))}
                 style={{ color: data.textColor }}
-                className="text-xl font-semibold mb-3"
+                className="text-xl font-bold mb-3"
               >
                 {item.title}
               </h3>
 
-              {/* Descripción — editable */}
               <p
                 {...editableProps(e => updateItem(index, 'description', e.currentTarget.innerText))}
                 style={{ color: data.textColor, opacity: 0.7 }}
-                className="text-sm leading-relaxed"
+                className="text-sm leading-relaxed mb-4"
               >
                 {item.description}
               </p>
 
-              {/* Precio opcional */}
               {item.price && (
-                <p style={{ color: data.accentColor }} className="mt-4 font-semibold text-sm">
+                <div style={{ color: data.accentColor }} className="font-bold text-lg">
                   {item.price}
-                </p>
+                </div>
               )}
+
+              {/* Flecha decorativa */}
+              <div style={{ color: data.accentColor }} className="mt-4 font-semibold text-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                Ver más →
+              </div>
             </div>
           ))}
         </div>

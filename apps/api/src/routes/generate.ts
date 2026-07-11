@@ -9,7 +9,7 @@ import type { Block } from '@shared/types';
 export const generateRouter = Router();
 
 generateRouter.post('/', rateLimitGenerate, validate(generateLayoutSchema), async (req, res) => {
-  const { businessName, sector, features, brandColor } = req.body;
+  const { businessName, sector, features, brandColor, logoUrl } = req.body;
 
   try {
     console.log(`[generate] Generando layout para "${businessName}" (${sector})`);
@@ -30,6 +30,7 @@ generateRouter.post('/', rateLimitGenerate, validate(generateLayoutSchema), asyn
         features: JSON.stringify(features),
         globalPalette: aiLayout.globalPalette as any,
         blocks: blocks as any,
+        logoUrl: logoUrl || null,
       },
     });
 

@@ -107,6 +107,7 @@ export interface GalleryBlockData extends BaseBlockData {
 export interface ContactBlockData extends BaseBlockData {
   title: string;
   subtitle: string;
+  cardBackgroundColor?: string;
   buttonText: string;
   buttonColor: string;
   showPhone: boolean;
@@ -162,6 +163,7 @@ export interface WebsiteProject {
   features: Feature[];
   blocks: Block[];
   globalPalette: GlobalPalette;
+  logoUrl?: string;
   publishedUrl?: string;
   createdAt: Date;
   updatedAt: Date;
