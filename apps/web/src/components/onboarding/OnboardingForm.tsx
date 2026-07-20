@@ -5,6 +5,7 @@ import type { Sector, Feature } from '@shared/types';
 import { useRouter } from 'next/navigation';
 import { ColorPicker } from './ColorPicker';
 import { LogoUpload } from './LogoUpload';
+import { BusinessProfileForm, EMPTY_BUSINESS_PROFILE } from './BusinessProfileForm';
 
 const SECTORS: { value: Sector; label: string; icon: string; description: string }[] = [
   { value: 'beauty',       label: 'Belleza & Spa',    icon: '💅', description: 'Salon, estetica, spa' },
@@ -64,17 +65,18 @@ const FEATURES_BY_SECTOR: Record<Sector, { value: Feature; label: string; icon: 
   ],
 };
 
-const STEP_LABELS = ['Nombre', 'Sector', 'Funciones', 'Color', 'Logo'];
+const STEP_LABELS = ['Nombre', 'Sector', 'Funciones', 'Color', 'Tu negocio', 'Logo'];
 
 export function OnboardingForm() {
   const router = useRouter();
-  const [step, setStep]                 = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [step, setStep]                 = useState<1 | 2 | 3 | 4 | 5 | 6>(1);
   const [businessName, setBusinessName] = useState('');
   const [sector, setSector]             = useState<Sector | null>(null);
   const [features, setFeatures]         = useState<Feature[]>([]);
   const [brandColor, setBrandColor]     = useState<string | null>(null);
   const [logoUrl, setLogoUrl]           = useState<string | null>(null);
   const [customRequest, setCustomRequest] = useState('');
+  const [businessProfile, setBusinessProfile] = useState(EMPTY_BUSINESS_PROFILE);
 
   const toggleFeature = (f: Feature) =>
     setFeatures(prev => prev.includes(f) ? prev.filter(x => x !== f) : [...prev, f]);
@@ -84,7 +86,7 @@ export function OnboardingForm() {
   const handleGoToSummary = () => {
     if (!sector || !businessName || !brandColor) return;
     sessionStorage.setItem('onboarding_draft', JSON.stringify({
-      businessName, sector, features, brandColor, logoUrl, customRequest: customRequest.trim() || undefined,
+      businessName, sector, features, brandColor, logoUrl, customRequest: customRequest.trim() || undefined, businessProfile,
     }));
     router.push('/onboarding/resumen');
   };
@@ -102,7 +104,7 @@ export function OnboardingForm() {
         <div className="max-w-2xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-slate-400">
-              Paso <span className="text-white font-semibold">{step}</span> de 5
+              Paso <span className="text-white font-semibold">{step}</span> de 6
             </span>
             <span className="text-sm font-medium text-blue-400">{STEP_LABELS[step - 1]}</span>
           </div>
@@ -110,7 +112,7 @@ export function OnboardingForm() {
           <div className="h-1 bg-white/10 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-500"
-              style={{ width: `${(step / 5) * 100}%` }}
+              style={{ width: `${(step / 6) * 100}%` }}
             />
           </div>
         </div>
@@ -305,7 +307,10 @@ export function OnboardingForm() {
         )}
 
         {/* PASO 5 */}
-        {step === 5 && (
+        {step === 5 && sector && <div><div className="mb-8"><h1 className="text-4xl font-black mb-3">Cuéntanos más de tu negocio</h1><p className="text-slate-400">Responde lo esencial ahora; la personalización adicional es opcional.</p></div><BusinessProfileForm value={businessProfile} onChange={setBusinessProfile} sector={sector} features={features}/><div className="flex gap-3 mt-8"><button onClick={()=>setStep(4)} className="px-6 py-4 border border-white/10 rounded-2xl text-slate-400">Atrás</button><button onClick={()=>setStep(6)} disabled={businessProfile.description.trim().length<20||!businessProfile.services.some(s=>s.name.trim().length>=2)} className="flex-1 py-4 bg-blue-600 rounded-2xl font-bold disabled:opacity-30">Continuar</button></div></div>}
+
+        {/* PASO 6 */}
+        {step === 6 && (
           <div>
             <div className="mb-10">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-medium mb-6">
@@ -343,7 +348,7 @@ export function OnboardingForm() {
               </div>
             )}
             <div className="flex gap-3">
-              <button onClick={() => setStep(4)} className="px-6 py-4 border border-white/10 rounded-2xl text-slate-400 hover:bg-white/5 transition-colors font-medium">
+              <button onClick={() => setStep(5)} className="px-6 py-4 border border-white/10 rounded-2xl text-slate-400 hover:bg-white/5 transition-colors font-medium">
                 Atras
               </button>
               <button

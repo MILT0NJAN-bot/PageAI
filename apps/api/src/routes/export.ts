@@ -26,6 +26,10 @@ exportRouter.get('/:id/export', requireProjectAccess, async (req, res) => {
       adminNotes:    project.adminNotes || undefined,
       estimatedPrice: project.estimatedPrice ?? undefined,
       finalPrice:     project.finalPrice ?? undefined,
+      businessProfile: (project.businessProfile || undefined) as WebsiteProject['businessProfile'],
+      ownerEmail: project.ownerEmail || undefined,
+      demoExpiresAt: project.demoExpiresAt || undefined,
+      quoteRequestedAt: project.quoteRequestedAt || undefined,
       publishedUrl:  project.publishedUrl || undefined,
     };
 

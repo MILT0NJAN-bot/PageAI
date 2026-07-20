@@ -33,8 +33,12 @@ function renderBlock(block: Block) {
 
 export function PublicSite({ project, canEdit = false }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [quoteRequested, setQuoteRequested] = useState(project.status === 'QUOTE_REQUESTED');
   const blocks = [...project.blocks].filter(block => block.isVisible).sort((a, b) => a.order - b.order);
   const navigation = blocks.filter(block => SECTION_LABELS[block.type]);
+  const hasContact = blocks.some(block => block.type === 'contact');
+  const expired = Boolean(project.demoExpiresAt && new Date(project.demoExpiresAt) < new Date());
+  async function requestQuote(){const api=process.env.NEXT_PUBLIC_API_URL||'http://localhost:3001';const response=await fetch(`${api}/api/projects/${project.id}/request-quote`,{method:'POST',credentials:'include',headers:{'x-project-token':project.accessToken||''}});if(response.ok)setQuoteRequested(true)}
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: project.globalPalette.background, color: project.globalPalette.text }}>
@@ -48,11 +52,11 @@ export function PublicSite({ project, canEdit = false }: Props) {
           </nav>
           <div className="hidden md:flex items-center gap-3">
             {blocks.some(block => block.type === 'custom_feature') && <a href="#custom_feature" className="px-4 py-2.5 rounded-xl border text-sm font-bold" style={{ borderColor: project.globalPalette.primary, color: project.globalPalette.primary }}>Iniciar sesión</a>}
-            <a href="#contact" className="px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-lg" style={{ backgroundColor: project.globalPalette.primary }}>Contactar</a>
+            {hasContact && <a href="#contact" className="px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-lg" style={{ backgroundColor: project.globalPalette.primary }}>Contactar</a>}
           </div>
           <button onClick={() => setMenuOpen(value => !value)} className="md:hidden w-10 h-10 rounded-xl bg-slate-100 text-slate-900 text-xl" aria-label="Abrir menú">{menuOpen ? '×' : '☰'}</button>
         </div>
-        {menuOpen && <nav className="md:hidden px-5 pb-5 bg-white border-t border-slate-100 flex flex-col gap-1">{navigation.map(block => <a key={block.id} onClick={() => setMenuOpen(false)} href={`#${block.type === 'hero' ? 'inicio' : block.type}`} className="px-4 py-3 rounded-xl text-slate-700 font-semibold hover:bg-slate-50">{SECTION_LABELS[block.type]}</a>)}<a href="#contact" onClick={() => setMenuOpen(false)} className="mt-2 px-4 py-3 rounded-xl text-center text-white font-bold" style={{ backgroundColor: project.globalPalette.primary }}>Contactar</a></nav>}
+        {menuOpen && <nav className="md:hidden px-5 pb-5 bg-white border-t border-slate-100 flex flex-col gap-1">{navigation.map(block => <a key={block.id} onClick={() => setMenuOpen(false)} href={`#${block.type === 'hero' ? 'inicio' : block.type}`} className="px-4 py-3 rounded-xl text-slate-700 font-semibold hover:bg-slate-50">{SECTION_LABELS[block.type]}</a>)}{hasContact&&<a href="#contact" onClick={() => setMenuOpen(false)} className="mt-2 px-4 py-3 rounded-xl text-center text-white font-bold" style={{ backgroundColor: project.globalPalette.primary }}>Contactar</a>}</nav>}
       </header>
 
       <main>
@@ -66,7 +70,11 @@ export function PublicSite({ project, canEdit = false }: Props) {
         </div>
       </footer>
 
-      {canEdit && <Link href={`/editor/${project.id}${project.accessToken ? `?token=${encodeURIComponent(project.accessToken)}` : ''}`} className="fixed right-5 bottom-5 z-50 px-5 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-2xl transition-colors">Editar diseño</Link>}
+      <div className="fixed left-4 bottom-4 z-50 px-3 py-2 rounded-full bg-slate-950/90 text-white text-xs shadow-xl">Demo de Page AI {expired ? '• Vencida' : '• Editable por 15 días'}</div>
+      <div className="fixed right-5 bottom-5 z-50 flex gap-2">
+        {!expired&&<button onClick={requestQuote} disabled={quoteRequested} className="px-5 py-3 rounded-full bg-emerald-600 text-white text-sm font-bold shadow-2xl disabled:bg-emerald-800">{quoteRequested?'Cotización solicitada':'Solicitar cotización'}</button>}
+        {canEdit&&!expired&&<Link href={`/editor/${project.id}${project.accessToken ? `?token=${encodeURIComponent(project.accessToken)}` : ''}`} className="px-5 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-2xl transition-colors">Editar diseño</Link>}
+      </div>
     </div>
   );
 }

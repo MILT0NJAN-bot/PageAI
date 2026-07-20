@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { AIGeneratedLayout, Sector, Feature } from '@shared/types';
+import type { AIGeneratedLayout, Sector, Feature, BusinessProfile } from '@shared/types';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -28,7 +28,7 @@ PALETAS PREMIUM POR SECTOR (úsalas como inspiración):
 - professional: corporate trust (#1E3A5F, #F8FAFC, #0A1628), emerald authority (#065F46, #F0FDF4, #022C22)
 - education: vibrant learn (#7C3AED, #FAF5FF, #1E0A3C), warm knowledge (#D97706, #FFFBEB, #1C0A00)
 
-ESQUEMA JSON — genera EXACTAMENTE esta estructura:
+ESQUEMA JSON DE REFERENCIA. Incluye ÚNICAMENTE los tipos indicados en "Bloques a generar" y nunca agregues secciones no solicitadas:
 {
   "globalPalette": {
     "primary": "#HEX",
@@ -210,16 +210,18 @@ export async function generateWebsiteLayout(params: {
   sector: Sector;
   features: Feature[];
   brandColor?: string;
+  businessProfile?: BusinessProfile;
 }): Promise<AIGeneratedLayout> {
-  const { businessName, sector, features, brandColor } = params;
+  const { businessName, sector, features, brandColor, businessProfile } = params;
 
-  const blocksToGenerate = [
-    'hero',
-    'services',
-    'testimonials',
-    ...new Set(features.map(f => FEATURE_TO_BLOCK_TYPE[f]).filter(Boolean)),
-    'contact',
-  ].slice(0, 6);
+  const goal = businessProfile?.primaryGoal;
+  const requested = new Set<string>(['hero']);
+  if (features.includes('services_list') || features.includes('menu') || ['services', 'sales', 'menu'].includes(goal || '')) requested.add('services');
+  if (features.includes('gallery')) requested.add('gallery');
+  if (features.includes('testimonials')) requested.add('testimonials');
+  if (features.includes('pricing')) requested.add('pricing');
+  if (features.some(f => ['booking', 'reservations', 'whatsapp', 'location'].includes(f)) || ['whatsapp', 'calls', 'appointments', 'quotes', 'store_visits'].includes(goal || '')) requested.add('contact');
+  const blocksToGenerate = [...requested];
 
   const colorInstruction = brandColor
     ? `\nCOLOR DE MARCA OBLIGATORIO: ${brandColor}. Usa este HEX exacto como "primary" y como "accentColor" en TODOS los bloques. El resto de la paleta debe armonizar con este color manteniendo contraste WCAG AA minimo.`
@@ -230,16 +232,28 @@ Negocio: "${businessName}"
 Sector: ${sector}
 Bloques a generar: ${blocksToGenerate.join(', ')}
 ${colorInstruction}
+${businessProfile ? `
+PERFIL REAL DEL NEGOCIO:
+${JSON.stringify(businessProfile, null, 2)}
+
+REGLAS DEL PERFIL:
+- El objetivo principal define el CTA principal y el orden narrativo.
+- Usa exclusivamente los servicios, precios, contacto, ubicación y horarios proporcionados.
+- Adapta vocabulario y beneficios al público ideal.
+- El diferenciador debe ser protagonista en el hero.
+- Respeta estilo visual, tono, colores a evitar, frase obligatoria y promoción.
+- Si hay fotografías propias, usa sus URLs en la galería o portada antes que imágenes genéricas.
+- Si un dato real no fue proporcionado, no lo inventes.
+` : ''}
 
 INSTRUCCIONES ESPECIFICAS:
 - Genera contenido 100% autentico y especifico para "${businessName}"
 - El headline del Hero debe ser memorable y unico para este negocio
-- Los servicios deben tener nombres reales del sector ${sector}, no genericos
-- Los precios de servicios deben ser realistas para Mexico (MXN)
-- Los testimonios deben mencionar resultados concretos y sonar naturales
+- ${sector === 'retail' || goal === 'sales' ? 'La sección services representa PRODUCTOS y debe usar los productos reales proporcionados.' : goal === 'menu' ? 'La sección services representa el MENÚ y debe usar platillos reales proporcionados.' : 'La sección services representa servicios reales proporcionados por el cliente.'}
+- No inventes precios: usa únicamente los proporcionados y omite los demás
+${requested.has('testimonials') ? '- Los testimonios son ejemplos visuales y deben indicarse como contenido de muestra, nunca como clientes reales' : '- PROHIBIDO generar testimonios porque el cliente no los solicitó'}
 - La paleta debe transmitir la personalidad del sector: ${sector}
-- Genera SIEMPRE 4 servicios minimo
-- Genera SIEMPRE 3 testimonios
+- Genera exclusivamente estos bloques: ${blocksToGenerate.join(', ')}
 `.trim();
 
   const completion = await openai.chat.completions.create({
@@ -272,6 +286,31 @@ INSTRUCCIONES ESPECIFICAS:
     throw new Error('Estructura JSON incompleta');
   }
 
+  // La IA nunca puede agregar una sección que el cliente no haya solicitado.
+  parsed.blocks = parsed.blocks.filter((block: { type?: string }) => block?.type && requested.has(block.type));
+
+  // Los datos proporcionados por el cliente siempre ganan sobre lo que proponga la IA.
+  if (businessProfile) {
+    for (const block of parsed.blocks) {
+      if (block.type === 'hero') block.data.ctaText = businessProfile.primaryAction;
+      if (block.type === 'services') {
+        block.data.title = sector === 'retail' || goal === 'sales' ? 'Nuestros productos' : goal === 'menu' ? 'Nuestro menú' : block.data.title;
+        block.data.items = businessProfile.services.map((item, index) => ({ id: `real_${index + 1}`, icon: sector === 'retail' ? '◆' : goal === 'menu' ? '✦' : '✓', title: item.name, description: item.description || `Conoce más sobre ${item.name}.`, ...(item.price ? { price: item.price } : {}) }));
+      }
+      if (block.type === 'gallery' && businessProfile.photos?.length) {
+        block.data.images = businessProfile.photos.map((url, index) => ({ id: `photo_${index + 1}`, url, alt: `${businessName} - imagen ${index + 1}` }));
+      }
+      if (block.type === 'contact') {
+        block.data.phone = businessProfile.phone || businessProfile.whatsapp || undefined;
+        block.data.email = businessProfile.email || undefined;
+        block.data.address = businessProfile.address || undefined;
+        block.data.showPhone = Boolean(block.data.phone);
+        block.data.showEmail = Boolean(block.data.email);
+        block.data.showAddress = Boolean(block.data.address);
+      }
+    }
+  }
+
   if (brandColor) {
     parsed.globalPalette.primary = brandColor;
   }
@@ -284,8 +323,9 @@ export async function generateHeroPreview(params: {
   sector: Sector;
   features: Feature[];
   brandColor?: string;
+  businessProfile?: BusinessProfile;
 }): Promise<{ globalPalette: AIGeneratedLayout['globalPalette']; hero: any }> {
-  const { businessName, sector, brandColor } = params;
+  const { businessName, sector, brandColor, businessProfile } = params;
 
   const colorInstruction = brandColor
     ? `\nCOLOR DE MARCA: ${brandColor}. Usalo como primary y accentColor.`
@@ -295,6 +335,7 @@ export async function generateHeroPreview(params: {
 Negocio: "${businessName}"
 Sector: ${sector}
 ${colorInstruction}
+${businessProfile ? `Perfil del negocio: ${JSON.stringify(businessProfile)}` : ''}
 
 Genera SOLO el bloque hero con contenido especifico e impactante para "${businessName}".
 Responde con este JSON exacto:

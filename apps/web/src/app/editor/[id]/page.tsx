@@ -1,5 +1,5 @@
 import { LiveEditor } from '@/components/editor/LiveEditor';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import type { WebsiteProject } from '@shared/types';
@@ -24,6 +24,7 @@ export default async function EditorPage({ params, searchParams }: EditorPagePro
   const session = await getServerSession(authOptions);
   const project = await getProject(params.id, searchParams.token, Boolean(session));
   if (!project) notFound();
+  if (!session && project.demoExpiresAt && new Date(project.demoExpiresAt) < new Date()) redirect(`/preview/${project.id}?token=${encodeURIComponent(searchParams.token || '')}`);
 
   const logoUrl = searchParams?.logoUrl;
 

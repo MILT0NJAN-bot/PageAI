@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { calculatePrice, formatPrice } from '@/lib/pricing';
-import type { Sector, Feature } from '@shared/types';
-interface DraftData { businessName: string; sector: Sector; features: Feature[]; brandColor: string; logoUrl?: string; customRequest?: string; }
+import type { Sector, Feature, BusinessProfile } from '@shared/types';
+interface DraftData { businessName: string; sector: Sector; features: Feature[]; brandColor: string; logoUrl?: string; customRequest?: string; businessProfile?: BusinessProfile; }
 interface HeroPreview { globalPalette: { primary: string; secondary: string; background: string; text: string }; hero: { headline: string; subheadline: string; ctaText: string; backgroundColor: string; textColor: string; accentColor: string; }; }
 const SECTOR_LABELS: Record<Sector, string> = { beauty: 'Belleza & Spa', restaurant: 'Restaurante', fitness: 'Fitness & Salud', retail: 'Tienda / Retail', professional: 'Servicios Profesionales', education: 'Educacion' };
 export default function ResumenPage() {
@@ -15,6 +15,8 @@ export default function ResumenPage() {
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   useEffect(() => {
@@ -22,13 +24,16 @@ export default function ResumenPage() {
     if (!saved) { router.replace('/onboarding'); return; }
     const parsedDraft: DraftData = JSON.parse(saved);
     setDraft(parsedDraft);
-    fetch(apiUrl + '/api/generate-preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(parsedDraft) })
+    const cacheKey='pageai_preview_'+btoa(unescape(encodeURIComponent(saved))).slice(-80);
+    const cached=sessionStorage.getItem(cacheKey);
+    if(cached){setPreview(JSON.parse(cached));setIsLoadingPreview(false);return;}
+    fetch(apiUrl + '/api/generate-preview', { method: 'POST', credentials:'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(parsedDraft) })
       .then(async res => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || data.detail || 'No pudimos generar tu preview.');
         return data;
       })
-      .then(setPreview)
+      .then(data=>{setPreview(data);sessionStorage.setItem(cacheKey,JSON.stringify(data))})
       .catch(err => setError(err instanceof Error ? err.message : 'No pudimos generar tu preview.'))
       .finally(() => setIsLoadingPreview(false));
   }, [router, apiUrl]);
@@ -39,9 +44,17 @@ export default function ResumenPage() {
     setError(null);
     setIsGenerating(true);
     try {
-      await fetch(apiUrl + '/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ businessName: draft.businessName, email, whatsapp: whatsapp || undefined, sector: draft.sector }) });
-      const res = await fetch(apiUrl + '/api/generate-layout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(draft) });
+      if (!codeSent) {
+        const response=await fetch(apiUrl+'/api/verification/request',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})}); const data=await response.json();
+        if(!response.ok)throw new Error(data.error||'No se pudo enviar el código');
+        setCodeSent(true); if(data.devCode)setVerificationCode(data.devCode); setIsGenerating(false); return;
+      }
+      const verification=await fetch(apiUrl+'/api/verification/verify',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code:verificationCode})}); const verificationData=await verification.json();
+      if(!verification.ok)throw new Error(verificationData.error||'No se pudo verificar el correo');
+      await fetch(apiUrl + '/api/leads', { method: 'POST', credentials:'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ businessName: draft.businessName, email, whatsapp: whatsapp || undefined, sector: draft.sector }) });
+      const res = await fetch(apiUrl + '/api/generate-layout', { method: 'POST', credentials:'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({...draft,verificationToken:verificationData.verificationToken}) });
       const data = await res.json();
+      if (res.status===409 && data.projectId && data.accessToken) { sessionStorage.removeItem('onboarding_draft'); router.push('/preview/'+data.projectId+'?edit=1&token='+encodeURIComponent(data.accessToken)); return; }
       if (!res.ok) throw new Error(data.message || data.detail || 'Error al generar el sitio.');
       const { projectId, accessToken } = data;
       if (draft.logoUrl) sessionStorage.setItem('editor_logo_' + projectId, draft.logoUrl);
@@ -85,6 +98,7 @@ export default function ResumenPage() {
             </div>
           )}
         </div>
+        {draft.businessProfile && <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 mb-6"><h3 className="font-bold mb-4">Perfil usado por la IA</h3><div className="grid sm:grid-cols-2 gap-4 text-sm"><div><p className="text-slate-500">Descripción</p><p className="text-slate-300">{draft.businessProfile.description}</p></div><div><p className="text-slate-500">Público ideal</p><p className="text-slate-300">{draft.businessProfile.targetAudience}</p></div><div><p className="text-slate-500">Diferenciador</p><p className="text-slate-300">{draft.businessProfile.differentiator}</p></div><div><p className="text-slate-500">Servicios reales</p><p className="text-slate-300">{draft.businessProfile.services.map(service=>service.name).join(', ')}</p></div></div></div>}
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl overflow-hidden mb-6">
           <div className="p-6">
             <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-4">Desglose de cotizacion</h3>
@@ -114,13 +128,14 @@ export default function ResumenPage() {
         ) : (
           <form onSubmit={handleSubmitLead} className="bg-white/[0.04] border border-white/10 rounded-2xl p-6">
             <h3 className="font-semibold text-white mb-1">Casi listo</h3>
-            <p className="text-sm text-slate-400 mb-5">Dejanos tu contacto y generamos tu sitio completo y editable.</p>
+            <p className="text-sm text-slate-400 mb-5">Verifica tu correo para crear una demo privada, editable y disponible durante 15 días.</p>
             <div className="space-y-3 mb-5">
-              <input type="email" required placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl border-2 border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none transition-colors" />
-              <input type="tel" placeholder="WhatsApp (opcional pero recomendado)" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} className="w-full px-4 py-3 rounded-xl border-2 border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none transition-colors" />
+              <input type="email" required disabled={codeSent} placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl border-2 border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none transition-colors disabled:opacity-60" />
+              {!codeSent&&<input type="tel" placeholder="WhatsApp (opcional pero recomendado)" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} className="w-full px-4 py-3 rounded-xl border-2 border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none transition-colors" />}
+              {codeSent&&<><input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required autoFocus placeholder="Código de 6 dígitos" value={verificationCode} onChange={e=>setVerificationCode(e.target.value.replace(/\D/g,''))} className="w-full px-4 py-3 text-center tracking-[.5em] text-xl rounded-xl border-2 border-blue-500/40 bg-white/5 text-white focus:outline-none"/><button type="button" onClick={()=>{setCodeSent(false);setVerificationCode('')}} className="text-xs text-blue-400">Cambiar correo o solicitar otro código</button></>}
             </div>
             <button type="submit" disabled={isGenerating} className="w-full py-4 text-white rounded-xl font-semibold text-lg disabled:opacity-50 transition-opacity hover:opacity-90" style={{ backgroundColor: draft.brandColor }}>
-              {isGenerating ? 'Generando tu sitio...' : 'Generar mi sitio completo'}
+              {isGenerating ? (codeSent?'Verificando y generando...':'Enviando código...') : (codeSent?'Verificar y generar demo editable':'Enviar código de verificación')}
             </button>
           </form>
         )}

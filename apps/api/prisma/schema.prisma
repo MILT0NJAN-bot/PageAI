@@ -21,11 +21,40 @@ model Project {
   adminNotes    String?  @db.Text
   estimatedPrice Int?
   finalPrice    Int?
+  businessProfile Json?
+  ownerEmail    String?
+  demoExpiresAt DateTime?
+  quoteRequestedAt DateTime?
   publishedUrl  String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@map("projects")
+}
+
+model EmailVerification {
+  id        String   @id @default(cuid())
+  email     String
+  codeHash  String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  verifiedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@map("email_verifications")
+}
+
+model UsageCounter {
+  id          String   @id @default(cuid())
+  scopeKey    String
+  action      String
+  count       Int      @default(0)
+  windowStart DateTime
+  updatedAt   DateTime @updatedAt
+
+  @@unique([scopeKey, action])
+  @@map("usage_counters")
 }
 
 model Lead {

@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { db } from '../db/client';
 import { z } from 'zod';
-import { requireAdmin, requireProjectAccess } from '../middleware/projectAccess';
+import { requireAdmin, requireProjectAccess, requireEditableDemo } from '../middleware/projectAccess';
 
 export const projectsRouter = Router();
 
@@ -28,7 +28,7 @@ projectsRouter.get('/:id', requireProjectAccess, async (req, res) => {
 });
 
 // PUT /api/projects/:id — auto-save del editor
-projectsRouter.put('/:id', requireProjectAccess, async (req, res) => {
+projectsRouter.put('/:id', requireEditableDemo, async (req, res) => {
   const updateSchema = z.object({
     blocks:        z.array(z.any()).optional(),
     globalPalette: z.record(z.string()).optional(),
@@ -36,10 +36,11 @@ projectsRouter.put('/:id', requireProjectAccess, async (req, res) => {
     features:      z.array(z.string()).optional(),
     logoUrl:       z.string().url().max(2048).optional().nullable(),
     customRequest: z.string().max(500).optional().nullable(),
-    status: z.enum(['NEW', 'CONTACTED', 'QUOTED', 'APPROVED', 'IN_PROGRESS', 'WAITING_CLIENT', 'PUBLISHED', 'ARCHIVED']).optional(),
+    status: z.enum(['NEW','DEMO_ACTIVE','QUOTE_REQUESTED','DEMO_EXPIRED','CONTACTED','QUOTED','APPROVED','IN_PROGRESS','WAITING_CLIENT','PUBLISHED','ARCHIVED']).optional(),
     adminNotes: z.string().max(5000).optional().nullable(),
     estimatedPrice: z.number().int().nonnegative().optional().nullable(),
     finalPrice: z.number().int().nonnegative().optional().nullable(),
+    businessProfile: z.record(z.any()).optional().nullable(),
   });
 
   const result = updateSchema.safeParse(req.body);
@@ -59,6 +60,7 @@ projectsRouter.put('/:id', requireProjectAccess, async (req, res) => {
         ...(result.data.adminNotes !== undefined && { adminNotes: result.data.adminNotes }),
         ...(result.data.estimatedPrice !== undefined && { estimatedPrice: result.data.estimatedPrice }),
         ...(result.data.finalPrice !== undefined && { finalPrice: result.data.finalPrice }),
+        ...(result.data.businessProfile !== undefined && { businessProfile: result.data.businessProfile as any }),
       },
     });
     res.json(deserializeProject(updated));
@@ -66,6 +68,16 @@ projectsRouter.put('/:id', requireProjectAccess, async (req, res) => {
     if (err.code === 'P2025') return res.status(404).json({ error: 'Proyecto no encontrado' });
     res.status(500).json({ error: 'Error al actualizar proyecto' });
   }
+});
+
+projectsRouter.post('/:id/request-quote', requireEditableDemo, async (req,res)=>{
+  try { const project=await db.project.update({where:{id:req.params.id},data:{status:'QUOTE_REQUESTED',quoteRequestedAt:new Date()}}); res.json({ok:true,status:project.status}); }
+  catch { res.status(500).json({error:'No se pudo solicitar la cotización'}); }
+});
+
+projectsRouter.post('/:id/reactivate', requireAdmin, async (req,res)=>{
+  try { const project=await db.project.update({where:{id:req.params.id},data:{status:'DEMO_ACTIVE',demoExpiresAt:new Date(Date.now()+15*24*60*60*1000)}}); res.json(deserializeProject(project)); }
+  catch { res.status(500).json({error:'No se pudo reactivar la demo'}); }
 });
 
 // DELETE /api/projects/:id
@@ -88,7 +100,7 @@ projectsRouter.get('/', requireAdmin, async (req, res) => {
       db.project.findMany({
         skip: (page - 1) * limit, take: limit,
         orderBy: { createdAt: 'desc' },
-        select: { id: true, businessName: true, sector: true, features: true, logoUrl: true, customRequest: true, accessToken: true, status: true, estimatedPrice: true, finalPrice: true, createdAt: true, publishedUrl: true },
+        select: { id: true, businessName: true, sector: true, features: true, logoUrl: true, customRequest: true, businessProfile: true, accessToken: true, status: true, ownerEmail:true, demoExpiresAt:true, quoteRequestedAt:true, estimatedPrice: true, finalPrice: true, createdAt: true, publishedUrl: true },
       }),
       db.project.count(),
     ]);

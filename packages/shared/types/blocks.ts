@@ -167,6 +167,33 @@ export interface GlobalPalette {
   text: string;        // Texto principal
 }
 
+export interface BusinessServiceInput { name: string; description?: string; price?: string; }
+export interface BusinessProfile {
+  description: string;
+  primaryGoal: 'whatsapp' | 'calls' | 'appointments' | 'services' | 'sales' | 'menu' | 'quotes' | 'trust' | 'store_visits';
+  targetAudience: string;
+  differentiator: string;
+  primaryAction: string;
+  visualStyle: 'elegant' | 'modern' | 'minimal' | 'premium' | 'corporate' | 'youthful' | 'artisan' | 'colorful';
+  colorMode: 'light' | 'dark' | 'auto';
+  communicationTone: 'professional' | 'friendly' | 'elegant' | 'fun' | 'inspiring' | 'direct' | 'technical';
+  avoidColors?: string;
+  referenceUrl?: string;
+  services: BusinessServiceInput[];
+  whatsapp?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  hours?: string;
+  socialMedia?: string;
+  photos?: string[];
+  serviceArea?: string;
+  requiredPhrase?: string;
+  currentPromotion?: string;
+  contentRules: string[];
+}
+
 // ── Proyecto completo ───────────────────────────────────────────
 
 export interface WebsiteProject {
@@ -179,10 +206,14 @@ export interface WebsiteProject {
   logoUrl?: string;
   customRequest?: string;
   accessToken?: string;
-  status?: 'NEW' | 'CONTACTED' | 'QUOTED' | 'APPROVED' | 'IN_PROGRESS' | 'WAITING_CLIENT' | 'PUBLISHED' | 'ARCHIVED';
+  status?: 'NEW' | 'DEMO_ACTIVE' | 'QUOTE_REQUESTED' | 'DEMO_EXPIRED' | 'CONTACTED' | 'QUOTED' | 'APPROVED' | 'IN_PROGRESS' | 'WAITING_CLIENT' | 'PUBLISHED' | 'ARCHIVED';
   adminNotes?: string;
   estimatedPrice?: number;
   finalPrice?: number;
+  businessProfile?: BusinessProfile;
+  ownerEmail?: string;
+  demoExpiresAt?: Date;
+  quoteRequestedAt?: Date;
   publishedUrl?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -197,6 +228,7 @@ export interface OnboardingPayload {
   brandColor?: string;
   logoUrl?: string;
   customRequest?: string;
+  businessProfile?: BusinessProfile;
 }
 
 // ── Respuesta de la IA (contrato del prompt) ───────────────────

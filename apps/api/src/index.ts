@@ -9,6 +9,8 @@ import { previewRouter }  from './routes/preview';
 import { leadsRouter }    from './routes/leads';
 import { uploadRouter }   from './routes/upload';
 import { exportRouter }   from './routes/export';
+import { verificationRouter } from './routes/verification';
+import { visitorCookie } from './services/demoSecurity.service';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,6 +20,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
+app.use(visitorCookie);
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
@@ -29,6 +32,7 @@ app.use('/api/generate-preview', previewRouter);
 app.use('/api/leads',            leadsRouter);
 app.use('/api/upload-logo',      uploadRouter);
 app.use('/api/projects',         exportRouter);  // GET /api/projects/:id/export
+app.use('/api/verification',     verificationRouter);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('[error]', err.message);
