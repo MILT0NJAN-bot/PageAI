@@ -70,7 +70,7 @@ export function PublicSite({ project, canEdit = false }: Props) {
         </div>
       </footer>
 
-      <div className="fixed left-4 bottom-4 z-50 px-3 py-2 rounded-full bg-slate-950/90 text-white text-xs shadow-xl">Demo de Page AI {expired ? '• Vencida' : '• Editable por 15 días'}</div>
+      <div className="fixed left-4 bottom-4 z-50 px-3 py-2 rounded-full bg-slate-950/90 text-white text-xs shadow-xl">Demo de CraftPage {expired ? '• Vencida' : '• Editable por 15 días'}</div>
       <div className="fixed right-5 bottom-5 z-50 flex gap-2">
         {!expired&&<button onClick={requestQuote} disabled={quoteRequested} className="px-5 py-3 rounded-full bg-emerald-600 text-white text-sm font-bold shadow-2xl disabled:bg-emerald-800">{quoteRequested?'Cotización solicitada':'Solicitar cotización'}</button>}
         {canEdit&&!expired&&<Link href={`/editor/${project.id}${project.accessToken ? `?token=${encodeURIComponent(project.accessToken)}` : ''}`} className="px-5 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-2xl transition-colors">Editar diseño</Link>}

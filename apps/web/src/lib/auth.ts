@@ -1,6 +1,8 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
+import { adminRateLimit, getRequestIp, verifyAdminChallenge, verifyAdminPassword } from './adminSecurity';
+
+const secureCookies = process.env.NODE_ENV === 'production';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -9,24 +11,23 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email:    { label: 'Email',      type: 'email'    },
         password: { label: 'Contrasena', type: 'password' },
+        otp:       { label: 'Codigo',     type: 'text'     },
+        challenge: { label: 'Challenge', type: 'text'     },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
-
-        const adminEmail = process.env.ADMIN_EMAIL;
-        const adminHash  = process.env.ADMIN_PASSWORD_HASH;
-
-        if (!adminEmail || !adminHash) {
-          console.error('[auth] ADMIN_EMAIL o ADMIN_PASSWORD_HASH no definidos en .env.local');
+      async authorize(credentials, req) {
+        if (!credentials?.email || !credentials?.password || !credentials?.otp || !credentials?.challenge) return null;
+        if (credentials.email.length > 254 || credentials.password.length > 200 || !/^\d{6}$/.test(credentials.otp)) return null;
+        const ip = getRequestIp(req.headers);
+        const rate = await adminRateLimit(credentials.email, ip, 'check');
+        if (!rate.allowed) return null;
+        const passwordValid = await verifyAdminPassword(credentials.email, credentials.password);
+        const challengeValid = verifyAdminChallenge(credentials.challenge, credentials.email, credentials.otp);
+        if (!passwordValid || !challengeValid) {
+          await adminRateLimit(credentials.email, ip, 'failure');
           return null;
         }
-
-        if (credentials.email !== adminEmail) return null;
-
-        const isValid = await bcrypt.compare(credentials.password, adminHash);
-        if (!isValid) return null;
-
-        return { id: '1', name: 'Milton Alcaraz', email: adminEmail };
+        await adminRateLimit(credentials.email, ip, 'success');
+        return { id: 'admin', name: 'Administrador', email: credentials.email.trim().toLowerCase() };
       },
     }),
   ],
@@ -35,16 +36,28 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 7 * 24 * 60 * 60,
+    maxAge: 8 * 60 * 60,
+  },
+  jwt: { maxAge: 8 * 60 * 60 },
+  useSecureCookies: secureCookies,
+  cookies: {
+    sessionToken: {
+      name: secureCookies ? '__Secure-pageai.session-token' : 'pageai.session-token',
+      options: { httpOnly: true, sameSite: 'lax', path: '/', secure: secureCookies },
+    },
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) { token.id = user.id; token.role = 'admin'; }
       return token;
     },
     async session({ session, token }) {
-      if (token) (session.user as any).id = token.id;
+      if (token && session.user) { (session.user as any).id = token.id; (session.user as any).role = token.role; }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      try { return new URL(url).origin === baseUrl ? url : baseUrl; } catch { return baseUrl; }
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

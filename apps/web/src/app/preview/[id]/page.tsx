@@ -5,7 +5,7 @@ import { PublicSite } from '@/components/public/PublicSite';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-interface Props { params: { id: string }; searchParams: { edit?: string; token?: string }; }
+interface Props { params: Promise<{ id: string }>; searchParams: Promise<{ edit?: string; token?: string }>; }
 
 async function getProject(id: string, token?: string, isAdmin = false): Promise<WebsiteProject | null> {
   try {
@@ -16,14 +16,16 @@ async function getProject(id: string, token?: string, isAdmin = false): Promise<
 }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const routeParams = await params; const query = await searchParams;
   const session = await getServerSession(authOptions);
-  const project = await getProject(params.id, searchParams.token, Boolean(session));
+  const project = await getProject(routeParams.id, query.token, Boolean(session));
   return { title: project ? `${project.businessName} — Vista previa` : 'Página no encontrada' };
 }
 
 export default async function PreviewPage({ params, searchParams }: Props) {
+  const routeParams = await params; const query = await searchParams;
   const session = await getServerSession(authOptions);
-  const project = await getProject(params.id, searchParams.token, Boolean(session));
+  const project = await getProject(routeParams.id, query.token, Boolean(session));
   if (!project) notFound();
-  return <PublicSite project={project} canEdit={searchParams.edit === '1'} />;
+  return <PublicSite project={project} canEdit={query.edit === '1'} />;
 }

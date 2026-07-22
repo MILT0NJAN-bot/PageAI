@@ -11,6 +11,6 @@ async function forward(req: NextRequest, id: string, method: 'GET' | 'PUT' | 'DE
   return NextResponse.json(await response.json(), { status: response.status });
 }
 
-export function GET(req: NextRequest, { params }: { params: { id: string } }) { return forward(req, params.id, 'GET'); }
-export function PUT(req: NextRequest, { params }: { params: { id: string } }) { return forward(req, params.id, 'PUT'); }
-export function DELETE(req: NextRequest, { params }: { params: { id: string } }) { return forward(req, params.id, 'DELETE'); }
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) { return forward(req, (await params).id, 'GET'); }
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) { return forward(req, (await params).id, 'PUT'); }
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) { return forward(req, (await params).id, 'DELETE'); }

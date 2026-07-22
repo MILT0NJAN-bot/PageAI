@@ -2,9 +2,10 @@
   "name": "saas-nocode-mvp",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"pnpm --filter web dev\" \"pnpm --filter api dev\"",
-    "build": "pnpm --filter shared build && pnpm --filter web build && pnpm --filter api build",
-    "lint": "pnpm -r lint"
+    "dev": "pnpm --filter @shared/types build && concurrently \"pnpm --filter web dev\" \"pnpm --filter api dev\"",
+    "build": "pnpm --filter @shared/types build && pnpm --filter web build && pnpm --filter api build",
+    "lint": "pnpm -r lint",
+    "security:rotate-admin": "node scripts/rotate-admin-credentials.mjs"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",

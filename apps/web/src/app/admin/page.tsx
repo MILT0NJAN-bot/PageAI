@@ -44,9 +44,9 @@ export default async function AdminPage() {
       <nav className="border-b border-white/5 bg-slate-900/50 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-sm">P</div>
+            <img src="/craftpage-logo.png" alt="CraftPage" className="h-12 w-40 rounded-lg object-cover object-center" />
             <div>
-              <p className="font-bold text-sm">Page AI Admin</p>
+              <p className="font-bold text-sm">CraftPage Admin</p>
               <p className="text-slate-400 text-xs">{session.user?.email}</p>
             </div>
           </div>

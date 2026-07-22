@@ -55,7 +55,25 @@ export async function sendVerificationEmail(email: string, code: string) {
     if (process.env.NODE_ENV === 'production') throw new Error('Servicio de correo no configurado');
     return false;
   }
-  const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: process.env.RESEND_FROM_EMAIL || 'Page AI <onboarding@resend.dev>', to: [email], subject: 'Tu código de verificación de Page AI', html: `<div style="font-family:Arial;padding:24px"><h2>Verifica tu correo</h2><p>Tu código para generar la demo editable es:</p><p style="font-size:32px;font-weight:800;letter-spacing:8px">${code}</p><p>Caduca en 10 minutos.</p></div>` }) });
+  const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: process.env.RESEND_FROM_EMAIL || 'CraftPage <onboarding@resend.dev>', to: [email], subject: 'Tu código de verificación de CraftPage', html: `<div style="font-family:Arial;padding:24px"><h2>Verifica tu correo</h2><p>Tu código para generar la demo editable es:</p><p style="font-size:32px;font-weight:800;letter-spacing:8px">${code}</p><p>Caduca en 10 minutos.</p></div>` }) });
   if (!response.ok) throw new Error('No se pudo enviar el correo de verificación');
   return true;
+}
+
+export async function sendAdminLoginEmail(email: string, code: string) {
+  if (!process.env.RESEND_API_KEY) throw new Error('Servicio de correo no configurado');
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM_EMAIL || 'CraftPage <onboarding@resend.dev>', to: [email],
+      subject: 'Código de acceso administrativo de CraftPage',
+      html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:32px"><p style="color:#6578ff;font-weight:700">PAGE AI</p><h2>Confirma tu acceso</h2><p>Utiliza este código para entrar al panel administrativo:</p><p style="font-size:34px;font-weight:800;letter-spacing:8px">${code}</p><p style="color:#666">Caduca en 10 minutos. Si no intentaste iniciar sesión, ignora este mensaje.</p></div>`,
+    }),
+  });
+  if (!response.ok) {
+    const detail = await response.text();
+    console.error('[email] Resend admin login failed', response.status, detail.slice(0, 300));
+    throw new Error('No se pudo enviar el código administrativo');
+  }
 }

@@ -98,27 +98,27 @@ export function OnboardingForm() {
   const canGoToStep5 = canGoToStep4 && !!brandColor;
 
   return (
-    <div className="bg-slate-950 min-h-screen text-white">
+    <div className="onboarding-flow min-h-screen bg-[#080b14] text-white">
       {/* Header con progreso */}
-      <div className="border-b border-white/5 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-6 py-4">
+      <div className="sticky top-0 z-10 border-b border-white/[.07] bg-[#080b14]/85 backdrop-blur-2xl">
+        <div className="mx-auto max-w-3xl px-6 py-5">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-slate-400">
-              Paso <span className="text-white font-semibold">{step}</span> de 6
+            <span className="text-xs font-semibold uppercase tracking-[.14em] text-[#7f879a]">
+              Paso <span className="text-white">{step}</span> / 6
             </span>
-            <span className="text-sm font-medium text-blue-400">{STEP_LABELS[step - 1]}</span>
+            <span className="text-xs font-semibold uppercase tracking-[.14em] text-[#a8f46a]">{STEP_LABELS[step - 1]}</span>
           </div>
           {/* Barra de progreso */}
-          <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-[2px] overflow-hidden bg-white/10">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-500"
+              className="h-full bg-[#6578ff] transition-all duration-500"
               style={{ width: `${(step / 6) * 100}%` }}
             />
           </div>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-12">
+      <div className="mx-auto max-w-3xl px-6 py-14 md:py-20">
 
         {/* PASO 1 */}
         {step === 1 && (
@@ -172,7 +172,7 @@ export function OnboardingForm() {
               <p className="text-slate-400 text-lg">Esto define el estilo visual y el contenido que generara la IA.</p>
             </div>
             <div className="grid grid-cols-2 gap-3 mb-8">
-              {SECTORS.map(s => (
+              {SECTORS.map((s, index) => (
                 <button
                   key={s.value}
                   onClick={() => handleSectorChange(s.value)}
@@ -181,7 +181,7 @@ export function OnboardingForm() {
                       ? 'border-blue-500 bg-blue-500/15 shadow-lg shadow-blue-500/10'
                       : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'}`}
                 >
-                  <span className="text-3xl flex-shrink-0">{s.icon}</span>
+                  <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[.03] font-mono text-xs text-[#a8f46a]">0{index + 1}</span>
                   <div>
                     <p className="font-bold text-white text-sm">{s.label}</p>
                     <p className="text-slate-500 text-xs mt-0.5">{s.description}</p>
@@ -221,7 +221,7 @@ export function OnboardingForm() {
               <p className="text-slate-400 text-lg">Cada funcion que elijas aumenta el precio estimado.</p>
             </div>
             <div className="grid grid-cols-1 gap-2 mb-8">
-              {availableFeatures.map(f => (
+              {availableFeatures.map((f, index) => (
                 <label
                   key={f.value}
                   className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01]
@@ -239,7 +239,7 @@ export function OnboardingForm() {
                     ${features.includes(f.value) ? 'bg-blue-600 border-blue-600' : 'border-white/20'}`}>
                     {features.includes(f.value) && <span className="text-white text-xs font-bold">✓</span>}
                   </div>
-                  <span className="text-2xl flex-shrink-0">{f.icon}</span>
+                  <span className="flex-shrink-0 font-mono text-xs text-[#777d86]">0{index + 1}</span>
                   <span className="font-medium text-white">{f.label}</span>
                   {features.includes(f.value) && (
                     <span className="ml-auto text-xs text-blue-400 font-medium">Incluido</span>

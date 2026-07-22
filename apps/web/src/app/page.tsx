@@ -1,305 +1,103 @@
-﻿import Link from "next/link";
-import { AnimatedCounter } from "@/components/landing/AnimatedCounter";
-import { ScrollReveal } from "@/components/landing/ScrollReveal";
+import Link from 'next/link';
+import { ScrollReveal } from '@/components/landing/ScrollReveal';
 
-const CONTACT = {
-  name: "Milton Alcaraz",
-  email: "miltonjan3@gmail.com",
-  whatsapp: "3121000883",
-  instagram: "@tu_instagram",
-  facebook: "tu.facebook",
-  tiktok: "@tu_tiktok",
-};
+const EMAIL = 'pagecraft2026@gmail.com';
+const WHATSAPP = 'https://wa.me/523121000883?text=Hola%2C%20quiero%20una%20propuesta%20con%20CraftPage';
+const WHATSAPP_LABEL = '+52 312 100 0883 · 8:00–22:00 · respuesta máx. 10 min';
 
 const FEATURES = [
-  { icon: "zap", title: "Listo en 60 segundos", description: "Responde 5 preguntas y la IA genera tu sitio completo al instante con textos y colores personalizados." },
-  { icon: "palette", title: "Tu color de marca", description: "Elige el color que representa tu negocio y toda la paleta se adapta automaticamente con contraste perfecto." },
-  { icon: "edit", title: "Editor en vivo", description: "Haz clic en cualquier texto para editarlo directamente. Cambia colores y reordena secciones en tiempo real." },
-  { icon: "file", title: "Archivo listo para subir", description: "Descarga un HTML autocontenido que funciona en cualquier hosting del mundo, incluso cPanel basico." },
-  { icon: "money", title: "Cotizacion instantanea", description: "El precio se calcula automaticamente segun el sector y funcionalidades. Sin llamadas, sin esperar." },
-  { icon: "image", title: "Con tu logo", description: "Sube tu logo y se integra automaticamente en el navbar, hero y footer del sitio generado." },
-];
-
-const SECTORS = [
-  { icon: "💅", label: "Belleza y Spa" },
-  { icon: "🍽", label: "Restaurante" },
-  { icon: "💪", label: "Fitness" },
-  { icon: "🛍", label: "Retail" },
-  { icon: "💼", label: "Profesional" },
-  { icon: "📚", label: "Educacion" },
-];
-
-const STEPS = [
-  { num: "01", icon: "📝", title: "Nombre y sector", description: "Dinos como se llama tu negocio y en que industria operas." },
-  { num: "02", icon: "⚙️", title: "Funcionalidades", description: "Selecciona que secciones necesitas: citas, galeria, menu, precios y mas." },
-  { num: "03", icon: "🎨", title: "Color y logo", description: "Elige tu color de marca y sube tu logo. La IA genera la paleta completa." },
-  { num: "04", icon: "✨", title: "Sitio generado", description: "En segundos tienes un sitio profesional listo para editar y descargar." },
-];
-
-const STATS = [
-  { value: 50, suffix: "+", label: "Sitios generados" },
-  { value: 6, suffix: "", label: "Sectores disponibles" },
-  { value: 60, suffix: "s", label: "Tiempo de generacion" },
-  { value: 100, suffix: "%", label: "Personalizado con IA" },
-];
+  { code: '01', title: 'Contenido que sí corresponde', text: 'CraftPage usa tus servicios, productos y datos reales, sin agregar testimonios o información que no pediste.', kind: 'content' },
+  { code: '02', title: 'Dirección visual flexible', text: 'El sector, el objetivo, tus colores y referencias definen la apariencia de cada propuesta.', kind: 'palette' },
+  { code: '03', title: 'Edición antes de decidir', text: 'Cambia textos, colores y orden de secciones desde una vista previa privada.', kind: 'editor' },
+  { code: '04', title: 'Del concepto al proyecto', text: 'Solicita una cotización cuando el resultado represente correctamente lo que necesitas.', kind: 'handoff' },
+] as const;
 
 const FAQ = [
-  { q: "Necesito saber programar?", a: "No. El sistema genera todo automaticamente. Solo respondes preguntas y descargas el resultado." },
-  { q: "El sitio funciona en cualquier hosting?", a: "Si. Se genera un archivo HTML que funciona en Hostinger, GoDaddy, cPanel o cualquier hosting del mundo." },
-  { q: "Puedo modificar el sitio despues?", a: "Si. Puedes editar textos en el editor, cambiar colores globales y reordenar secciones antes de descargar." },
-  { q: "Que pasa si no me gusta el resultado?", a: "Puedes regenerar cuantas veces quieras antes de confirmar. Cada generacion produce un resultado diferente." },
-  { q: "El precio incluye el hosting?", a: "No. El precio es por el diseno y desarrollo del sitio. El cliente paga su propio hosting por separado." },
+  ['¿Necesito saber programación?', 'No. El proceso está guiado y solo necesitas conocer tu negocio. CraftPage se encarga de convertir esa información en una propuesta visual.'],
+  ['¿La demostración es el sitio definitivo?', 'Es una propuesta editable para validar diseño y contenido. La publicación, dominio y funciones avanzadas se cotizan según el proyecto.'],
+  ['¿Puedo usar mi logo y fotografías?', 'Sí. Puedes subir identidad y material propio, o comenzar sin ellos y completar la propuesta después.'],
+  ['¿Cuánto tengo que responder?', 'El modo rápido pide tres datos esenciales. Público, tono, referencias y otros detalles son completamente opcionales.'],
 ];
 
-const waUrl = "https://wa.me/523121000883?text=Hola%20Milton%2C%20me%20interesa%20un%20sitio%20web";
+function Arrow() {
+  return <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
 
-const ICON_MAP: Record<string, string> = {
-  zap: "⚡", palette: "🎨", edit: "✏️", file: "📁", money: "💰", image: "🖼️",
-};
+function Mark() {
+  return <span className="pageai-mark relative grid h-9 w-9 place-items-center overflow-hidden rounded-[11px] bg-[#6578ff] text-sm font-black text-white"><span className="relative z-10">P</span></span>;
+}
+
+function BrandLogo({ compact = false }: { compact?: boolean }) {
+  return <img src="/craftpage-logo.png" alt="CraftPage" className={`${compact ? 'h-11 w-36' : 'h-14 w-48'} rounded-lg object-cover object-center`} />;
+}
+
+function MiniVisual({ kind }: { kind: typeof FEATURES[number]['kind'] }) {
+  if (kind === 'content') return <div className="space-y-3"><span className="block h-2 w-16 rounded-full bg-[#a8f46a]" /><span className="block h-3 w-5/6 rounded-full bg-white/20" /><span className="block h-3 w-3/5 rounded-full bg-white/10" /><div className="flex gap-2 pt-3"><span className="h-7 w-20 rounded-lg bg-[#6578ff]" /><span className="h-7 w-16 rounded-lg border border-white/15" /></div></div>;
+  if (kind === 'palette') return <div className="flex h-full items-end gap-2"><span className="h-16 flex-1 rounded-xl bg-[#6578ff]" /><span className="h-24 flex-1 rounded-xl bg-[#a8f46a]" /><span className="h-12 flex-1 rounded-xl bg-[#f6adcb]" /><span className="h-20 flex-1 rounded-xl bg-white" /></div>;
+  if (kind === 'editor') return <div className="grid h-full grid-cols-[40px_1fr] overflow-hidden rounded-xl border border-white/10"><div className="space-y-3 border-r border-white/10 bg-white/5 p-2"><i className="block h-4 w-4 rounded bg-[#6578ff]" /><i className="block h-1 w-full rounded bg-white/15" /><i className="block h-1 w-3/4 rounded bg-white/15" /></div><div className="p-3"><div className="h-full rounded-lg bg-white p-3"><span className="block h-2 w-2/3 rounded bg-[#11182b]/80" /><span className="mt-2 block h-1 w-1/2 rounded bg-[#11182b]/20" /><span className="mt-4 block h-6 w-16 rounded bg-[#6578ff]" /></div></div></div>;
+  return <div className="relative flex h-full items-center justify-center"><span className="absolute h-24 w-24 rounded-full border border-[#6578ff]/40" /><span className="absolute h-16 w-16 rounded-full border border-[#a8f46a]/50" /><span className="grid h-10 w-10 place-items-center rounded-full bg-white text-[#11182b]"><Arrow /></span></div>;
+}
+
+function TrustStrip() {
+  return <><section className="border-b border-white/[.07] bg-[#0b0f1a] px-5 py-8 lg:px-8"><div className="mx-auto grid max-w-7xl gap-3 md:grid-cols-3"><div className="rounded-xl border border-white/[.08] bg-white/[.03] px-5 py-4"><p className="text-sm font-semibold">Sin tarjeta</p><p className="mt-1 text-xs text-[#858da1]">Conoce tu propuesta antes de decidir.</p></div><div className="rounded-xl border border-white/[.08] bg-white/[.03] px-5 py-4"><p className="text-sm font-semibold">Propuesta personalizada</p><p className="mt-1 text-xs text-[#858da1]">Contenido y estilo basados en tu negocio.</p></div><div className="rounded-xl border border-white/[.08] bg-white/[.03] px-5 py-4"><p className="text-sm font-semibold">Tú decides qué se publica</p><p className="mt-1 text-xs text-[#858da1]">Revisa y edita todo antes de avanzar.</p></div></div></section><a href={WHATSAPP} target="_blank" rel="noreferrer" aria-label="Contactar por WhatsApp" className="fixed bottom-5 right-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-[#25d366] text-xl font-bold text-white shadow-[0_10px_35px_rgba(37,211,102,.35)] transition-transform hover:scale-105">WA</a></>;
+}
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-sm">P</div>
-            <span className="font-bold text-lg tracking-tight">Page <span className="text-blue-400">AI</span></span>
-          </div>
-          <div className="hidden md:flex items-center gap-8 text-sm text-slate-400">
-            <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
-            <a href="#sectores" className="hover:text-white transition-colors">Sectores</a>
-            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
-            <a href="#contacto" className="hover:text-white transition-colors">Contacto</a>
-          </div>
-          <Link href="/onboarding" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold transition-all hover:scale-105">
-            Generar sitio
-          </Link>
+    <>
+    <main className="modern-home min-h-screen overflow-hidden bg-[#080b14] text-white selection:bg-[#a8f46a] selection:text-[#080b14]">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/[.07] bg-[#080b14]/75 backdrop-blur-2xl">
+        <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 lg:px-8">
+          <Link href="/" className="flex items-center gap-3"><BrandLogo compact /></Link>
+          <div className="hidden items-center gap-8 text-sm text-[#9098ac] md:flex"><a href="#como-funciona" className="hover:text-white">Cómo funciona</a><a href="#plataforma" className="hover:text-white">Plataforma</a><a href="#preguntas" className="hover:text-white">Preguntas</a><a href="#contacto" className="hover:text-white">Contacto</a></div>
+          <Link href="/onboarding" className="group flex items-center gap-2 rounded-xl border border-white/15 bg-white/[.06] px-4 py-2.5 text-sm font-semibold transition-all hover:border-[#6578ff]/70 hover:bg-[#6578ff]">Crear propuesta <span className="transition-transform group-hover:translate-x-1"><Arrow /></span></Link>
         </div>
       </nav>
 
-      <section className="pt-36 pb-28 px-6 text-center relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-blue-600/8 rounded-full blur-3xl" />
-          <div className="absolute top-20 left-1/4 w-72 h-72 bg-violet-600/6 rounded-full blur-3xl" />
-          <div className="absolute top-20 right-1/4 w-72 h-72 bg-cyan-600/6 rounded-full blur-3xl" />
-        </div>
-        <div className="relative max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm font-medium mb-8 animate-fade-in-down">
-            <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            Generacion de sitios web con Inteligencia Artificial
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight tracking-tight animate-fade-in-up delay-100">
-            Tu sitio web listo
-            <span className="text-shimmer"> en 60 segundos</span>
-          </h1>
-          <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-200">
-            Responde 5 preguntas, la IA genera contenido profesional y personalizado. Cotizacion automatica incluida.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up delay-300">
-            <Link href="/onboarding" className="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-lg font-bold transition-all hover:scale-105 shadow-xl shadow-blue-600/25">
-              Crear mi sitio gratis
-            </Link>
-            <a href={waUrl} target="_blank" rel="noopener noreferrer" className="px-10 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl text-lg font-semibold transition-all hover:scale-105">
-              Hablar por WhatsApp
-            </a>
-          </div>
-          <p className="mt-6 text-slate-500 text-sm animate-fade-in delay-400">Sin registro, sin tarjeta, resultado en segundos</p>
-        </div>
-      </section>
-
-      <section className="py-16 border-y border-white/5 bg-white/[0.02]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {STATS.map(function(stat, i) {
-              return (
-                <ScrollReveal key={stat.label} delay={i * 100}>
-                  <div className="text-center">
-                    <div className="text-4xl font-black text-white mb-1">
-                      <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-                    </div>
-                    <p className="text-slate-400 text-sm">{stat.label}</p>
-                  </div>
-                </ScrollReveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section id="sectores" className="py-10 bg-slate-900/30">
-        <div className="max-w-5xl mx-auto px-6">
-          <p className="text-center text-slate-500 text-sm mb-6 uppercase tracking-widest">Sectores disponibles</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {SECTORS.map(function(s, i) {
-              return (
-                <ScrollReveal key={s.label} delay={i * 60} direction="up">
-                  <div className="flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/8 rounded-full text-sm text-slate-300 hover:border-blue-500/40 hover:bg-blue-500/5 transition-all cursor-default">
-                    <span>{s.icon}</span>
-                    <span>{s.label}</span>
-                  </div>
-                </ScrollReveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section id="como-funciona" className="py-28 px-6">
-        <div className="max-w-5xl mx-auto">
-          <ScrollReveal>
-            <div className="text-center mb-20">
-              <p className="text-blue-400 text-sm font-semibold uppercase tracking-widest mb-3">Proceso</p>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Asi de simple</h2>
-              <p className="text-slate-400 text-lg max-w-xl mx-auto">De cero a sitio web profesional en menos de 2 minutos.</p>
+      <section className="relative px-5 pb-24 pt-36 lg:px-8 lg:pb-32 lg:pt-44">
+        <div className="hero-grid absolute inset-0 opacity-50" />
+        <div className="hero-glow pointer-events-none absolute left-[10%] top-20 h-[480px] w-[480px] rounded-full bg-[#6578ff]/20 blur-[130px]" />
+        <div className="mx-auto grid max-w-7xl items-center gap-20 lg:grid-cols-[.92fr_1.08fr]">
+          <div className="relative z-10">
+            <div className="animate-fade-in-down mb-7 flex w-fit items-center gap-2 rounded-full border border-[#a8f46a]/25 bg-[#a8f46a]/[.07] px-3 py-1.5 text-xs font-semibold text-[#baf789]"><span className="status-pulse h-1.5 w-1.5 rounded-full bg-[#a8f46a]" /> Propuestas web personalizadas</div>
+            <h1 className="animate-fade-in-up max-w-3xl text-[clamp(3.4rem,6.5vw,6.6rem)] font-semibold leading-[.94] tracking-[-.065em]">Haz visible<br /><span className="modern-gradient-text">lo que imaginas.</span></h1>
+            <p className="animate-fade-in-up delay-100 mt-7 max-w-xl text-lg leading-8 text-[#9aa2b7] md:text-xl">Describe tu negocio y recibe una propuesta web que puedes revisar, editar y convertir en un proyecto real.</p>
+            <div className="animate-fade-in-up delay-200 mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link href="/onboarding" className="group flex items-center justify-center gap-3 rounded-xl bg-[#6578ff] px-6 py-3.5 text-sm font-bold shadow-[0_12px_40px_rgba(101,120,255,.32)] transition-all hover:-translate-y-0.5 hover:bg-[#7385ff]">Crear mi propuesta <span className="transition-transform group-hover:translate-x-1"><Arrow /></span></Link>
+              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 rounded-xl border border-white/15 bg-white/[.04] px-6 py-3.5 text-sm font-semibold text-white/90 transition-all hover:border-white/30 hover:bg-white/[.08]">Hablar por WhatsApp</a>
             </div>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {STEPS.map(function(step, i) {
-              return (
-                <ScrollReveal key={step.num} delay={i * 120} direction={i % 2 === 0 ? "left" : "right"}>
-                  <div className="relative p-8 rounded-2xl bg-white/[0.03] border border-white/8 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all group cursor-default">
-                    <div className="text-6xl font-black text-white/4 absolute top-4 right-6 select-none">{step.num}</div>
-                    <div className="text-3xl mb-5">{step.icon}</div>
-                    <h3 className="text-xl font-bold mb-3 text-white">{step.title}</h3>
-                    <p className="text-slate-400 leading-relaxed">{step.description}</p>
-                  </div>
-                </ScrollReveal>
-              );
-            })}
+            <div className="animate-fade-in delay-300 mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[#747d92]"><span className="flex items-center gap-2"><i className="h-1 w-1 rounded-full bg-[#a8f46a]" /> Vista previa sin costo</span><span className="flex items-center gap-2"><i className="h-1 w-1 rounded-full bg-[#a8f46a]" /> Sin tarjeta</span><span className="flex items-center gap-2"><i className="h-1 w-1 rounded-full bg-[#a8f46a]" /> Editable</span></div>
           </div>
-        </div>
-      </section>
 
-      <section className="py-28 px-6 bg-white/[0.02] border-y border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <ScrollReveal>
-            <div className="text-center mb-20">
-              <p className="text-blue-400 text-sm font-semibold uppercase tracking-widest mb-3">Caracteristicas</p>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Todo lo que necesitas</h2>
-              <p className="text-slate-400 text-lg max-w-xl mx-auto">Sin codigo, sin disenador, sin esperas.</p>
-            </div>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map(function(f, i) {
-              return (
-                <ScrollReveal key={f.title} delay={i * 80}>
-                  <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/8 hover:border-blue-500/20 hover:bg-blue-500/5 transition-all group h-full">
-                    <div className="text-3xl mb-4">{ICON_MAP[f.icon] || f.icon}</div>
-                    <h3 className="font-bold text-white mb-2">{f.title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">{f.description}</p>
-                  </div>
-                </ScrollReveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-28 px-6">
-        <ScrollReveal>
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="p-12 rounded-3xl bg-gradient-to-br from-blue-600/20 via-violet-600/10 to-cyan-600/10 border border-blue-500/20">
-              <div className="text-5xl mb-6">🚀</div>
-              <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">Listo para ver tu sitio?</h2>
-              <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">Genera ahora una vista previa con cotizacion instantanea. Es gratis.</p>
-              <Link href="/onboarding" className="inline-block px-12 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-xl font-bold transition-all hover:scale-105 shadow-2xl shadow-blue-600/30">
-                Generar mi sitio gratis
-              </Link>
-            </div>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      <section id="faq" className="py-28 px-6 border-t border-white/5 bg-white/[0.02]">
-        <div className="max-w-3xl mx-auto">
-          <ScrollReveal>
-            <div className="text-center mb-16">
-              <p className="text-blue-400 text-sm font-semibold uppercase tracking-widest mb-3">FAQ</p>
-              <h2 className="text-4xl font-black tracking-tight mb-4">Preguntas frecuentes</h2>
-            </div>
-          </ScrollReveal>
-          <div className="space-y-3">
-            {FAQ.map(function(item, i) {
-              return (
-                <ScrollReveal key={i} delay={i * 80}>
-                  <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/8 hover:border-white/15 transition-all">
-                    <h3 className="font-bold text-white mb-2 flex items-center gap-2">
-                      <span className="text-blue-400">?</span>
-                      {item.q}
-                    </h3>
-                    <p className="text-slate-400 text-sm leading-relaxed pl-5">{item.a}</p>
-                  </div>
-                </ScrollReveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section id="contacto" className="py-28 px-6 border-t border-white/5">
-        <div className="max-w-4xl mx-auto">
-          <ScrollReveal>
-            <div className="text-center mb-14">
-              <p className="text-blue-400 text-sm font-semibold uppercase tracking-widest mb-3">Contacto</p>
-              <h2 className="text-4xl font-black tracking-tight mb-4">Hablemos</h2>
-              <p className="text-slate-400">Tienes dudas o quieres cotizar directamente? Escribeme.</p>
-            </div>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <ScrollReveal delay={0} direction="left">
-              <a href={waUrl} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-green-500/10 border border-green-500/20 hover:border-green-500/40 hover:bg-green-500/15 transition-all group h-full">
-                <div className="w-14 h-14 rounded-2xl bg-green-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">💬</div>
-                <div className="text-center">
-                  <p className="font-bold text-white mb-1">WhatsApp</p>
-                  <p className="text-green-400 font-mono text-sm">{CONTACT.whatsapp}</p>
-                  <p className="text-slate-500 text-xs mt-1">Respondo en minutos</p>
-                </div>
-              </a>
-            </ScrollReveal>
-            <ScrollReveal delay={100}>
-              <a href={"mailto:" + CONTACT.email} className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-blue-500/10 border border-blue-500/20 hover:border-blue-500/40 hover:bg-blue-500/15 transition-all group h-full">
-                <div className="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">✉️</div>
-                <div className="text-center">
-                  <p className="font-bold text-white mb-1">Email</p>
-                  <p className="text-blue-400 text-sm break-all">{CONTACT.email}</p>
-                  <p className="text-slate-500 text-xs mt-1">Para cotizaciones formales</p>
-                </div>
-              </a>
-            </ScrollReveal>
-            <ScrollReveal delay={200} direction="right">
-              <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-violet-500/10 border border-violet-500/20 h-full">
-                <div className="w-14 h-14 rounded-2xl bg-violet-500/20 flex items-center justify-center text-2xl">📱</div>
-                <div className="text-center">
-                  <p className="font-bold text-white mb-3">Redes sociales</p>
-                  <div className="flex flex-col gap-2 text-sm">
-                    <span className="text-violet-400">{CONTACT.instagram}</span>
-                    <span className="text-violet-400">{CONTACT.facebook}</span>
-                    <span className="text-violet-400">{CONTACT.tiktok}</span>
-                  </div>
-                </div>
+          <div className="relative mx-auto w-full max-w-[680px] lg:mx-0">
+            <div className="product-orbit absolute -inset-6 rounded-[32px] border border-[#6578ff]/15" />
+            <div className="product-window relative overflow-hidden rounded-[18px] border border-white/10 bg-[#111625] shadow-[0_35px_100px_rgba(0,0,0,.55)]">
+              <div className="flex h-12 items-center justify-between border-b border-white/[.08] px-4"><div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/15" /><i className="h-2 w-2 rounded-full bg-white/15" /><i className="h-2 w-2 rounded-full bg-white/15" /></div><span className="text-[10px] text-white/35">CraftPage · Editor</span><span className="rounded-md bg-[#a8f46a] px-2.5 py-1 text-[9px] font-bold text-[#11182b]">GUARDADO</span></div>
+              <div className="grid min-h-[430px] grid-cols-[74px_1fr] sm:grid-cols-[160px_1fr]">
+                <aside className="border-r border-white/[.08] bg-[#0d111d] p-3 sm:p-4"><div className="mb-8 flex items-center gap-2"><Mark /><span className="hidden text-xs font-semibold sm:block">Mi negocio</span></div><p className="mb-3 hidden text-[9px] font-bold uppercase tracking-widest text-white/25 sm:block">Secciones</p>{['Inicio', 'Servicios', 'Galería', 'Contacto'].map((item,index)=><div key={item} className={`mb-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[10px] ${index===0?'bg-[#6578ff]/15 text-[#9ba8ff]':'text-white/35'}`}><span className={`h-1.5 w-1.5 rounded-full ${index===0?'bg-[#6578ff]':'bg-white/15'}`} /><span className="hidden sm:block">{item}</span></div>)}</aside>
+                <div className="bg-[#e8e9ef] p-3 sm:p-5"><div className="h-full overflow-hidden rounded-[12px] bg-white shadow-xl"><div className="flex h-9 items-center justify-between px-4"><span className="h-2 w-16 rounded bg-[#151b2c]" /><div className="flex gap-2"><span className="h-1.5 w-8 rounded bg-[#c6c8d0]" /><span className="h-1.5 w-8 rounded bg-[#c6c8d0]" /></div></div><div className="relative m-2 overflow-hidden rounded-[10px] bg-[#151b2c] px-5 py-10 sm:m-3 sm:px-8 sm:py-12"><span className="mb-6 block w-fit rounded-full border border-[#a8f46a]/30 bg-[#a8f46a]/10 px-2 py-1 text-[7px] font-bold text-[#a8f46a]">BIENVENIDO</span><span className="mb-2 block h-4 w-[88%] rounded bg-white" /><span className="block h-4 w-[60%] rounded bg-white" /><span className="mt-5 block h-1.5 w-[70%] rounded bg-white/20" /><span className="mt-2 block h-1.5 w-[52%] rounded bg-white/20" /><span className="mt-7 block h-8 w-24 rounded-lg bg-[#6578ff]" /><span className="editor-cursor absolute bottom-12 right-12"><svg viewBox="0 0 24 24" className="h-7 w-7 drop-shadow-lg"><path d="M5 3l14 9-6 2-3 6L5 3z" fill="white" stroke="#11182b" strokeWidth="1.5" /></svg></span></div><div className="grid grid-cols-3 gap-2 px-3 pb-3">{[0,1,2].map(i=><div key={i} className="rounded-lg border border-[#11182b]/10 p-2"><span className="block h-2 w-6 rounded bg-[#6578ff]/35" /><span className="mt-4 block h-1.5 w-4/5 rounded bg-[#d3d5dc]" /></div>)}</div></div></div>
               </div>
-            </ScrollReveal>
+            </div>
+            <div className="floating-chip chip-one absolute -left-8 top-24 hidden items-center gap-2 rounded-xl border border-white/10 bg-[#171d2e]/90 px-3 py-2 text-xs shadow-xl backdrop-blur md:flex"><span className="grid h-6 w-6 place-items-center rounded-lg bg-[#a8f46a]/15 text-[#a8f46a]">✓</span> Contenido validado</div>
+            <div className="floating-chip chip-two absolute -bottom-5 right-8 hidden items-center gap-2 rounded-xl border border-white/10 bg-[#171d2e]/90 px-3 py-2 text-xs shadow-xl backdrop-blur md:flex"><span className="h-2 w-2 rounded-full bg-[#6578ff]" /> Vista responsive</div>
           </div>
         </div>
       </section>
 
-      <footer className="py-10 px-6 border-t border-white/5">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center font-black text-xs">P</div>
-            <span className="font-bold text-sm">Page <span className="text-blue-400">AI</span></span>
-          </div>
-          <p className="text-slate-500 text-sm">2026 {CONTACT.name} Todos los derechos reservados</p>
-          <Link href="/onboarding" className="text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium">Generar sitio</Link>
-        </div>
-      </footer>
+      <div className="overflow-hidden border-y border-white/[.07] bg-[#0d111d] py-4"><div className="modern-marquee flex w-max gap-12 text-[11px] font-semibold uppercase tracking-[.2em] text-white/35">{[...Array(2)].flatMap((_,copy)=>['Belleza y bienestar','Restaurantes','Tiendas','Servicios profesionales','Educación','Fitness'].map(item=><span key={`${copy}-${item}`} className="flex items-center gap-12">{item}<i className="h-1 w-1 rounded-full bg-[#6578ff]" /></span>))}</div></div>
 
-      <a href={waUrl} target="_blank" rel="noopener noreferrer" className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-400 rounded-full flex items-center justify-center shadow-xl shadow-green-500/30 transition-all hover:scale-110" title="Contactar por WhatsApp">
-        <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-      </a>
-    </div>
+      <section id="como-funciona" className="px-5 py-24 lg:px-8 lg:py-32"><div className="mx-auto max-w-7xl"><ScrollReveal><div className="mb-16 max-w-2xl"><p className="mb-4 text-xs font-bold uppercase tracking-[.18em] text-[#a8f46a]">Un proceso simple</p><h2 className="text-4xl font-semibold tracking-[-.045em] md:text-6xl">Tu idea avanza en tres pasos.</h2><p className="mt-5 text-lg text-[#8f97aa]">Sin empezar desde una plantilla vacía ni responder un formulario interminable.</p></div></ScrollReveal><div className="grid gap-px overflow-hidden rounded-2xl border border-white/[.08] bg-white/[.08] md:grid-cols-3">{[['01','Cuéntanos','Describe tu negocio, el objetivo y lo que deseas mostrar.'],['02','Visualiza','Recibe una propuesta completa adaptada a tus respuestas.'],['03','Perfecciona','Edita la demo y solicita una cotización cuando esté lista.']].map(([num,title,text],i)=><ScrollReveal key={num} delay={i*100} className="h-full"><article className="group h-full min-h-[260px] bg-[#0d111d] p-7 transition-colors hover:bg-[#12182a]"><div className="mb-20 flex items-center justify-between"><span className="font-mono text-xs text-[#6578ff]">{num}</span><span className="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/35 transition-all group-hover:border-[#a8f46a]/40 group-hover:text-[#a8f46a]"><Arrow /></span></div><h3 className="mb-3 text-xl font-semibold">{title}</h3><p className="text-sm leading-6 text-[#858da1]">{text}</p></article></ScrollReveal>)}</div></div></section>
+
+      <section id="plataforma" className="border-y border-white/[.07] bg-[#0b0f1a] px-5 py-24 lg:px-8 lg:py-32"><div className="mx-auto max-w-7xl"><ScrollReveal><div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end"><div><p className="mb-4 text-xs font-bold uppercase tracking-[.18em] text-[#6578ff]">Construida para tu negocio</p><h2 className="max-w-2xl text-4xl font-semibold tracking-[-.045em] md:text-6xl">Más control. Menos suposiciones.</h2></div><p className="max-w-md text-sm leading-6 text-[#858da1]">La IA propone; tú decides qué información, secciones y dirección visual representan a tu marca.</p></div></ScrollReveal><div className="grid gap-4 md:grid-cols-2">{FEATURES.map((feature,index)=><ScrollReveal key={feature.code} delay={index*80} direction={index%2?'right':'left'}><article className="group grid min-h-[300px] overflow-hidden rounded-2xl border border-white/[.08] bg-[#111625] p-7 sm:grid-cols-[1fr_180px] sm:gap-8"><div className="flex flex-col"><span className="mb-auto font-mono text-xs text-[#6578ff]">{feature.code}</span><h3 className="mb-3 mt-12 text-2xl font-semibold tracking-[-.025em]">{feature.title}</h3><p className="text-sm leading-6 text-[#858da1]">{feature.text}</p></div><div className="mt-8 min-h-[150px] rounded-2xl border border-white/[.07] bg-[#090d17] p-5 transition-transform duration-500 group-hover:-translate-y-1 sm:mt-0"><MiniVisual kind={feature.kind} /></div></article></ScrollReveal>)}</div></div></section>
+
+      <section id="preguntas" className="px-5 py-24 lg:px-8 lg:py-32"><div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[.75fr_1.25fr]"><ScrollReveal direction="left"><div className="lg:sticky lg:top-28"><p className="mb-4 text-xs font-bold uppercase tracking-[.18em] text-[#a8f46a]">Antes de comenzar</p><h2 className="text-4xl font-semibold tracking-[-.045em] md:text-5xl">Preguntas frecuentes.</h2><p className="mt-5 max-w-sm text-sm leading-6 text-[#858da1]">Si necesitas revisar un caso particular, también puedes escribirnos directamente.</p></div></ScrollReveal><ScrollReveal direction="right"><div className="border-t border-white/15">{FAQ.map(([question,answer],index)=><details key={question} className="group border-b border-white/10 py-6"><summary className="flex cursor-pointer list-none items-start justify-between gap-5 text-base font-semibold"><span><i className="mr-4 font-mono not-italic text-xs text-[#6578ff]">0{index+1}</i>{question}</span><span className="text-xl font-light text-white/40 transition-transform group-open:rotate-45">+</span></summary><p className="max-w-2xl pl-9 pt-4 text-sm leading-6 text-[#858da1]">{answer}</p></details>)}</div></ScrollReveal></div></section>
+
+      <section id="contacto" className="border-y border-white/[.07] bg-[#0d111d] px-5 py-20 lg:px-8 lg:py-24"><div className="mx-auto max-w-7xl"><ScrollReveal><div className="mb-10 max-w-xl"><p className="mb-4 text-xs font-bold uppercase tracking-[.18em] text-[#a8f46a]">Contacto</p><h2 className="text-4xl font-semibold tracking-[-.045em] md:text-5xl">Hablemos de tu proyecto.</h2><p className="mt-5 text-[#858da1]">Si ya tienes una idea o quieres revisar una propuesta, puedes contactarnos directamente.</p></div></ScrollReveal><div className="grid gap-4 md:grid-cols-2"><ScrollReveal direction="left"><a href={WHATSAPP} target="_blank" rel="noreferrer" className="group flex min-h-[170px] flex-col justify-between rounded-2xl border border-[#a8f46a]/20 bg-[#a8f46a]/[.06] p-7 transition-all hover:-translate-y-1 hover:border-[#a8f46a]/50"><div className="flex items-start justify-between"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[#a8f46a] font-bold text-[#11182b]">↗</span><Arrow /></div><div><p className="mb-1 text-lg font-semibold">WhatsApp</p><p className="text-sm text-[#a8f46a]">{WHATSAPP_LABEL}</p><p className="mt-1 text-xs text-[#858da1]">Respuesta directa para revisar tu idea.</p></div></a></ScrollReveal><ScrollReveal direction="right"><a href={`mailto:${EMAIL}`} className="group flex min-h-[170px] flex-col justify-between rounded-2xl border border-white/10 bg-white/[.03] p-7 transition-all hover:-translate-y-1 hover:border-[#6578ff]/60"><div className="flex items-start justify-between"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[#6578ff] text-xl font-bold text-white">@</span><Arrow /></div><div><p className="mb-1 text-lg font-semibold">Correo de contacto</p><p className="break-all text-sm text-[#9ba8ff]">{EMAIL}</p><p className="mt-1 text-xs text-[#858da1]">Para cotizaciones y consultas formales.</p></div></a></ScrollReveal></div></div></section>
+
+      <section className="px-5 pb-8 lg:px-8"><ScrollReveal><div className="cta-glow relative mx-auto max-w-7xl overflow-hidden rounded-[24px] border border-[#6578ff]/30 bg-[#6578ff] px-6 py-20 text-center md:px-12 md:py-28"><div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,.18),transparent_36%),radial-gradient(circle_at_85%_80%,rgba(168,244,106,.22),transparent_35%)]" /><div className="relative"><p className="mb-5 text-xs font-bold uppercase tracking-[.18em] text-white/70">Tu próxima página</p><h2 className="mx-auto max-w-4xl text-4xl font-semibold leading-tight tracking-[-.05em] md:text-7xl">Empieza con una propuesta que puedas ver.</h2><Link href="/onboarding" className="group mx-auto mt-9 flex w-fit items-center gap-3 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#11182b] transition-all hover:-translate-y-0.5 hover:shadow-xl">Crear mi propuesta <span className="transition-transform group-hover:translate-x-1"><Arrow /></span></Link></div></div></ScrollReveal></section>
+
+      <footer className="px-5 py-10 lg:px-8"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 border-t border-white/[.08] pt-8 text-sm md:flex-row md:items-center"><BrandLogo compact /><p className="text-white/35">Propuestas web creadas alrededor de tu negocio.</p><a href={`mailto:${EMAIL}`} className="text-white/55 transition-colors hover:text-white">{EMAIL}</a></div></footer>
+    </main>
+    </>
   );
 }

@@ -12,8 +12,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "paths": {
-      "@shared/types": ["../../packages/shared/types/index.ts"],
-      "@shared/types/*": ["../../packages/shared/types/*"]
+      "@shared/types": ["../../packages/shared/dist/types/index.d.ts"],
+      "@shared/types/*": ["../../packages/shared/dist/types/*"]
     }
   },
   "include": ["src/**/*"],

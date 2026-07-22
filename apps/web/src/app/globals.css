@@ -135,3 +135,94 @@
   opacity: 1;
   transform: translateX(0);
 }
+
+/* Movimiento y profundidad para la identidad moderna de CraftPage */
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.modern-gradient-text {
+  color: transparent;
+  background: linear-gradient(100deg, #ffffff 0%, #aeb8ff 45%, #a8f46a 100%);
+  background-size: 160% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: modernGradient 7s ease-in-out infinite alternate;
+}
+
+.pageai-mark::after {
+  content: '';
+  position: absolute;
+  inset: -60% -40%;
+  background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.45) 50%, transparent 65%);
+  transform: translateX(-100%);
+  animation: markShine 5s ease-in-out infinite;
+}
+
+.product-window { animation: productFloat 6s ease-in-out infinite; }
+.product-orbit { animation: orbitPulse 5s ease-in-out infinite; }
+.chip-one { animation: chipFloatOne 4.5s ease-in-out infinite; }
+.chip-two { animation: chipFloatTwo 5s ease-in-out infinite; }
+.editor-cursor { animation: cursorMove 4.5s ease-in-out infinite; }
+.status-pulse { box-shadow: 0 0 0 0 rgba(168,244,106,.55); animation: statusPulse 2s ease-out infinite; }
+.modern-marquee { animation: modernMarquee 24s linear infinite; }
+
+.onboarding-flow .bg-blue-600,
+.onboarding-flow .bg-blue-500 { background-color: #6578ff !important; }
+.onboarding-flow .border-blue-500 { border-color: #6578ff !important; }
+.onboarding-flow .text-blue-400,
+.onboarding-flow .text-blue-300 { color: #9ba8ff !important; }
+.onboarding-flow h1 { letter-spacing: -.045em; }
+.onboarding-flow > div:last-child { animation: fadeInUp .45s ease both; }
+
+@keyframes modernGradient {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+@keyframes markShine {
+  0%, 65% { transform: translateX(-110%); }
+  85%, 100% { transform: translateX(110%); }
+}
+@keyframes productFloat {
+  0%, 100% { transform: translateY(0) rotateX(0deg); }
+  50% { transform: translateY(-9px) rotateX(.5deg); }
+}
+@keyframes orbitPulse {
+  0%, 100% { transform: scale(.98); opacity: .4; }
+  50% { transform: scale(1.02); opacity: .8; }
+}
+@keyframes chipFloatOne {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-5px, -9px); }
+}
+@keyframes chipFloatTwo {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(6px, -7px); }
+}
+@keyframes cursorMove {
+  0%, 20%, 100% { transform: translate(0, 0); }
+  45% { transform: translate(-55px, -30px); }
+  55% { transform: translate(-55px, -30px) scale(.86); }
+  70% { transform: translate(-15px, -5px); }
+}
+@keyframes statusPulse {
+  0% { box-shadow: 0 0 0 0 rgba(168,244,106,.55); }
+  70% { box-shadow: 0 0 0 7px rgba(168,244,106,0); }
+  100% { box-shadow: 0 0 0 0 rgba(168,244,106,0); }
+}
+@keyframes modernMarquee {
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modern-home *, .modern-home *::before, .modern-home *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

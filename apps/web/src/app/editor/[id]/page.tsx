@@ -5,8 +5,8 @@ import { authOptions } from '@/lib/auth';
 import type { WebsiteProject } from '@shared/types';
 
 interface EditorPageProps {
-  params: { id: string };
-  searchParams: { logoUrl?: string; token?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ logoUrl?: string; token?: string }>;
 }
 
 async function getProject(id: string, token?: string, isAdmin = false): Promise<WebsiteProject | null> {
@@ -21,12 +21,13 @@ async function getProject(id: string, token?: string, isAdmin = false): Promise<
 }
 
 export default async function EditorPage({ params, searchParams }: EditorPageProps) {
+  const routeParams = await params; const query = await searchParams;
   const session = await getServerSession(authOptions);
-  const project = await getProject(params.id, searchParams.token, Boolean(session));
+  const project = await getProject(routeParams.id, query.token, Boolean(session));
   if (!project) notFound();
-  if (!session && project.demoExpiresAt && new Date(project.demoExpiresAt) < new Date()) redirect(`/preview/${project.id}?token=${encodeURIComponent(searchParams.token || '')}`);
+  if (!session && project.demoExpiresAt && new Date(project.demoExpiresAt) < new Date()) redirect(`/preview/${project.id}?token=${encodeURIComponent(query.token || '')}`);
 
-  const logoUrl = searchParams?.logoUrl;
+  const logoUrl = query?.logoUrl;
 
   return (
     <LiveEditor
